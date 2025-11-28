@@ -1,0 +1,54 @@
+# Node modules
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+
+# Python virtual environment
+ml-service/venv/
+ml-service/__pycache__/
+*.pyc
+
+# Environment variables
+.env
+backend/.env
+frontend/.env
+ml-service/.env
+# Ignore everything outside project
+../
+
+# Allow project folder contents
+!/backend/
+!/package*.json
+!src/
+!/server.js
+
+# Always ignore
+node_modules/
+*.env
+*.log
+
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Build files
+frontend/build/
+frontend/dist/
+
+# ML models (optional - you might want to commit these)
+ml-service/models/*.pkl
+
+# Temporary files
+*.tmp
+*.temp
