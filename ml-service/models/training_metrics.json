@@ -1,0 +1,94 @@
+{
+  "accuracy": 1.0,
+  "classification_report": {
+    "critical": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 200.0
+    },
+    "debug": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 200.0
+    },
+    "error": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 200.0
+    },
+    "info": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 200.0
+    },
+    "warning": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 200.0
+    },
+    "accuracy": 1.0,
+    "macro avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 1000.0
+    },
+    "weighted avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 1000.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      200,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      200,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      200,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      200,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      200
+    ]
+  ],
+  "classes": [
+    "critical",
+    "debug",
+    "error",
+    "info",
+    "warning"
+  ],
+  "training_samples": 4000,
+  "test_samples": 1000
+}
