@@ -1,0 +1,501 @@
+message,severity
+database connection established,info
+multiple cascading failures,critical
+report generated successfully,info
+webhook delivery failed,error
+api request failed 404 not found,error
+report generated successfully,info
+cache warmed up,info
+api request failed 404 not found,error
+system crash null pointer exception,critical
+memory allocated 1024 bytes,debug
+unrecoverable error data loss detected,critical
+failed to write to file system,error
+loop iteration 50 of 100,debug
+catastrophic failure in payment service,critical
+service health check passed,info
+api response successful,info
+object created user instance,debug
+complete system shutdown required,critical
+transaction committed,info
+exiting method calculate total,debug
+memory allocated 1024 bytes,debug
+thread spawned worker thread 3,debug
+high memory usage 85 percent,warning
+transaction committed,info
+critical data breach customer data exposed,critical
+cache lookup performed,debug
+file descriptor 42,debug
+cpu usage above 80 percent,warning
+authentication failed invalid credentials,error
+report generated successfully,info
+object created user instance,debug
+transaction committed,info
+query execution time 45ms,debug
+image processing failed,error
+security breach detected,critical
+data sync completed,info
+breakpoint hit line 234,debug
+complete system shutdown required,critical
+token expiring in 5 minutes,warning
+data corruption detected,critical
+cache hit for user profile,info
+multiple cascading failures,critical
+variable initialized userid 12345,debug
+email delivery failed,error
+multiple cascading failures,critical
+service completely unresponsive,critical
+database connection pool exhausted,critical
+fatal error kernel panic,critical
+object created user instance,debug
+security breach detected,critical
+critical security vulnerability,critical
+payment gateway timeout,error
+failed to parse json response,error
+memory allocated 1024 bytes,debug
+image processing failed,error
+out of memory system unstable,critical
+validation error missing required field,error
+emergency maintenance required,critical
+deprecated api endpoint used,warning
+emergency maintenance required,critical
+array size 150 elements,debug
+cache miss fetching from database,warning
+request completed in 45ms,info
+response sent 200 ok,debug
+system integrity compromised,critical
+system integrity compromised,critical
+thread spawned worker thread 3,debug
+disk full unable to write,critical
+large payload detected 5mb,warning
+service health check passed,info
+backup completed successfully,info
+database connection established,info
+session timeout warning,warning
+unusual traffic pattern detected,warning
+cache warmed up,info
+cache hit for user profile,info
+long running query detected,warning
+unrecoverable error data loss detected,critical
+object created user instance,debug
+variable initialized userid 12345,debug
+failed to write to file system,error
+security breach detected,critical
+file descriptor 42,debug
+external service unavailable,error
+database connection established,info
+complete system shutdown required,critical
+failed to connect to database,error
+array size 150 elements,debug
+backup completed successfully,info
+large payload detected 5mb,warning
+database connection established,info
+event triggered on data received,debug
+user authentication successful,info
+cache hit for user profile,info
+thread spawned worker thread 3,debug
+session created for user,info
+disk full unable to write,critical
+out of memory system unstable,critical
+stack trace captured,debug
+out of memory system unstable,critical
+token expiring in 5 minutes,warning
+condition evaluated true,debug
+system integrity compromised,critical
+user authentication successful,info
+backup completed successfully,info
+critical data breach customer data exposed,critical
+database connection established,info
+token expiring in 5 minutes,warning
+service health check passed,info
+external service unavailable,error
+failed to decrypt data,error
+response sent 200 ok,debug
+user logged in successfully,info
+all database replicas down,critical
+function called process payment,debug
+response time exceeded 500ms,warning
+connection pool near capacity,warning
+session timeout warning,warning
+failed to decrypt data,error
+security breach detected,critical
+high memory usage 85 percent,warning
+transaction rollback constraint violation,error
+application started successfully,info
+image processing failed,error
+cpu usage above 80 percent,warning
+connection pool near capacity,warning
+file descriptor 42,debug
+retry attempt 2 of 3,warning
+database query failed,error
+payment processed successfully,info
+fatal error kernel panic,critical
+image processing failed,error
+memory allocated 1024 bytes,debug
+cpu usage above 80 percent,warning
+failed to connect to database,error
+service completely unresponsive,critical
+external service unavailable,error
+catastrophic failure in payment service,critical
+service completely unresponsive,critical
+rate limit approaching threshold,warning
+disk full unable to write,critical
+long running query detected,warning
+garbage collection triggered,debug
+deadlock detected in critical path,critical
+failed login attempt,warning
+disk space low 15 percent remaining,warning
+data corruption detected,critical
+cache miss fetching from database,warning
+response time exceeded 500ms,warning
+loop iteration 50 of 100,debug
+all database replicas down,critical
+transaction rollback constraint violation,error
+all database replicas down,critical
+critical data breach customer data exposed,critical
+request received get api users,debug
+cache warmed up,info
+data corruption detected,critical
+large payload detected 5mb,warning
+variable initialized userid 12345,debug
+database connection pool exhausted,critical
+network request timeout,error
+server started on port 8080,info
+exiting method calculate total,debug
+unrecoverable error data loss detected,critical
+file descriptor 42,debug
+thread spawned worker thread 3,debug
+disk full unable to write,critical
+critical service unavailable,critical
+condition evaluated true,debug
+validation error missing required field,error
+service completely unresponsive,critical
+failed to decrypt data,error
+breakpoint hit line 234,debug
+invalid configuration parameter,error
+failed to write to file system,error
+webhook delivery failed,error
+data sync completed,info
+authentication failed invalid credentials,error
+api request failed 404 not found,error
+payment processed successfully,info
+configuration loaded,info
+webhook delivery failed,error
+function called process payment,debug
+slow network response detected,warning
+array size 150 elements,debug
+authentication failed invalid credentials,error
+file uploaded successfully,info
+critical service unavailable,critical
+unusual traffic pattern detected,warning
+validation error missing required field,error
+condition evaluated true,debug
+user logged in successfully,info
+query execution time 45ms,debug
+ssl certificate expires in 7 days,warning
+permission denied for resource,error
+long running query detected,warning
+email delivery failed,error
+critical security vulnerability,critical
+external service unavailable,error
+session created for user,info
+entering method validate input,debug
+data corruption detected,critical
+rate limit approaching threshold,warning
+email delivery failed,error
+file upload failed size exceeded,error
+connection refused by remote server,error
+long running query detected,warning
+deadlock detected in critical path,critical
+stack trace captured,debug
+server started on port 8080,info
+unusual traffic pattern detected,warning
+connection refused by remote server,error
+configuration loaded,info
+stale cache data detected,warning
+slow network response detected,warning
+report generated successfully,info
+webhook delivered successfully,info
+rate limit approaching threshold,warning
+data sync completed,info
+queue size growing 1000 messages,warning
+user authentication successful,info
+queue size growing 1000 messages,warning
+critical data breach customer data exposed,critical
+transaction rollback constraint violation,error
+connection refused by remote server,error
+cache hit for user profile,info
+deprecated api endpoint used,warning
+garbage collection triggered,debug
+disk space low 15 percent remaining,warning
+system integrity compromised,critical
+failed to parse json response,error
+unrecoverable error data loss detected,critical
+connection opened to cache server,debug
+disk full unable to write,critical
+application started successfully,info
+email sent to user,info
+server started on port 8080,info
+invalid configuration parameter,error
+network request timeout,error
+failed to decrypt data,error
+data sync completed,info
+api request failed 404 not found,error
+breakpoint hit line 234,debug
+complete system shutdown required,critical
+application started successfully,info
+file upload failed size exceeded,error
+system running out of memory,critical
+emergency maintenance required,critical
+report generated successfully,info
+session expired,error
+breakpoint hit line 234,debug
+maximum retry attempts reached,warning
+array size 150 elements,debug
+invalid configuration parameter,error
+session timeout warning,warning
+connection opened to cache server,debug
+database query failed,error
+backup completed successfully,info
+session expired,error
+entering method validate input,debug
+connection pool near capacity,warning
+file upload failed size exceeded,error
+api response successful,info
+critical data breach customer data exposed,critical
+file upload failed size exceeded,error
+stale cache data detected,warning
+request received get api users,debug
+service completely unresponsive,critical
+entering method validate input,debug
+payment gateway timeout,error
+file upload failed size exceeded,error
+cache miss fetching from database,warning
+disk space low 15 percent remaining,warning
+file uploaded successfully,info
+large payload detected 5mb,warning
+service health check passed,info
+email sent to user,info
+user logged in successfully,info
+deprecated api endpoint used,warning
+email delivery failed,error
+user authentication successful,info
+retry attempt 2 of 3,warning
+stack trace captured,debug
+stale cache data detected,warning
+permission denied for resource,error
+query execution time 45ms,debug
+token expiring in 5 minutes,warning
+function called process payment,debug
+transaction committed,info
+cpu usage above 80 percent,warning
+user logged in successfully,info
+queue size growing 1000 messages,warning
+transaction committed,info
+application started successfully,info
+external service unavailable,error
+connection refused by remote server,error
+session created for user,info
+event triggered on data received,debug
+entering method validate input,debug
+cache lookup performed,debug
+request received get api users,debug
+failed login attempt,warning
+service health check passed,info
+api request failed 404 not found,error
+transaction rollback constraint violation,error
+failed to decrypt data,error
+large payload detected 5mb,warning
+ssl certificate expires in 7 days,warning
+webhook delivery failed,error
+failed to connect to database,error
+payment processed successfully,info
+deprecated api endpoint used,warning
+request received get api users,debug
+cache warmed up,info
+session expired,error
+rate limit approaching threshold,warning
+thread spawned worker thread 3,debug
+session expired,error
+configuration loaded,info
+file uploaded successfully,info
+image processing failed,error
+event triggered on data received,debug
+catastrophic failure in payment service,critical
+query execution time 45ms,debug
+all database replicas down,critical
+retry attempt 2 of 3,warning
+all database replicas down,critical
+cache miss fetching from database,warning
+database query failed,error
+request completed in 45ms,info
+connection refused by remote server,error
+critical security vulnerability,critical
+out of memory system unstable,critical
+system crash null pointer exception,critical
+network request timeout,error
+payment gateway timeout,error
+server started on port 8080,info
+user authentication successful,info
+response time exceeded 500ms,warning
+out of memory system unstable,critical
+fatal error kernel panic,critical
+high memory usage 85 percent,warning
+function called process payment,debug
+server started on port 8080,info
+invalid configuration parameter,error
+system running out of memory,critical
+stack trace captured,debug
+cache lookup performed,debug
+disk space low 15 percent remaining,warning
+cache miss fetching from database,warning
+queue size growing 1000 messages,warning
+event triggered on data received,debug
+catastrophic failure in payment service,critical
+maximum retry attempts reached,warning
+exiting method calculate total,debug
+failed to connect to database,error
+disk space low 15 percent remaining,warning
+breakpoint hit line 234,debug
+failed login attempt,warning
+failed to parse json response,error
+emergency maintenance required,critical
+ssl certificate expires in 7 days,warning
+slow network response detected,warning
+system running out of memory,critical
+critical service unavailable,critical
+critical security vulnerability,critical
+connection pool near capacity,warning
+session created for user,info
+high memory usage 85 percent,warning
+loop iteration 50 of 100,debug
+critical service unavailable,critical
+function called process payment,debug
+unusual traffic pattern detected,warning
+high memory usage 85 percent,warning
+long running query detected,warning
+payment gateway timeout,error
+variable initialized userid 12345,debug
+invalid configuration parameter,error
+security breach detected,critical
+webhook delivery failed,error
+validation error missing required field,error
+connection opened to cache server,debug
+system crash null pointer exception,critical
+email sent to user,info
+response sent 200 ok,debug
+catastrophic failure in payment service,critical
+application started successfully,info
+deadlock detected in critical path,critical
+transaction rollback constraint violation,error
+database connection pool exhausted,critical
+webhook delivered successfully,info
+exiting method calculate total,debug
+response sent 200 ok,debug
+maximum retry attempts reached,warning
+stale cache data detected,warning
+array size 150 elements,debug
+memory allocated 1024 bytes,debug
+cache warmed up,info
+maximum retry attempts reached,warning
+connection pool near capacity,warning
+ssl certificate expires in 7 days,warning
+slow network response detected,warning
+file descriptor 42,debug
+cpu usage above 80 percent,warning
+exiting method calculate total,debug
+loop iteration 50 of 100,debug
+request completed in 45ms,info
+configuration loaded,info
+token expiring in 5 minutes,warning
+response time exceeded 500ms,warning
+authentication failed invalid credentials,error
+data corruption detected,critical
+session timeout warning,warning
+cache lookup performed,debug
+network request timeout,error
+payment processed successfully,info
+stale cache data detected,warning
+email delivery failed,error
+multiple cascading failures,critical
+payment processed successfully,info
+system running out of memory,critical
+cache lookup performed,debug
+request received get api users,debug
+unrecoverable error data loss detected,critical
+garbage collection triggered,debug
+database connection pool exhausted,critical
+rate limit approaching threshold,warning
+deadlock detected in critical path,critical
+retry attempt 2 of 3,warning
+entering method validate input,debug
+email sent to user,info
+fatal error kernel panic,critical
+webhook delivered successfully,info
+condition evaluated true,debug
+critical security vulnerability,critical
+file uploaded successfully,info
+deprecated api endpoint used,warning
+response time exceeded 500ms,warning
+multiple cascading failures,critical
+user logged in successfully,info
+system crash null pointer exception,critical
+session created for user,info
+failed login attempt,warning
+database query failed,error
+api response successful,info
+event triggered on data received,debug
+failed to write to file system,error
+email sent to user,info
+query execution time 45ms,debug
+webhook delivered successfully,info
+retry attempt 2 of 3,warning
+deadlock detected in critical path,critical
+request completed in 45ms,info
+complete system shutdown required,critical
+connection opened to cache server,debug
+failed to write to file system,error
+variable initialized userid 12345,debug
+permission denied for resource,error
+connection opened to cache server,debug
+session expired,error
+permission denied for resource,error
+emergency maintenance required,critical
+system crash null pointer exception,critical
+cache hit for user profile,info
+slow network response detected,warning
+ssl certificate expires in 7 days,warning
+system running out of memory,critical
+data sync completed,info
+garbage collection triggered,debug
+failed to connect to database,error
+maximum retry attempts reached,warning
+response sent 200 ok,debug
+failed to parse json response,error
+file uploaded successfully,info
+failed login attempt,warning
+condition evaluated true,debug
+request completed in 45ms,info
+session timeout warning,warning
+api response successful,info
+permission denied for resource,error
+network request timeout,error
+failed to parse json response,error
+webhook delivered successfully,info
+system integrity compromised,critical
+backup completed successfully,info
+critical service unavailable,critical
+stack trace captured,debug
+configuration loaded,info
+queue size growing 1000 messages,warning
+loop iteration 50 of 100,debug
+authentication failed invalid credentials,error
+garbage collection triggered,debug
+database connection pool exhausted,critical
+validation error missing required field,error
+fatal error kernel panic,critical
+database query failed,error
+unusual traffic pattern detected,warning
+api response successful,info
+object created user instance,debug
+payment gateway timeout,error
