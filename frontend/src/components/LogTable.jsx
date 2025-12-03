@@ -1,4 +1,5 @@
-import { AlertCircle, AlertTriangle, Bug, Info, XCircle } from 'lucide-react';
+// frontend/src/components/LogTable.jsx
+import { AlertCircle, AlertTriangle, Bug, CheckCircle, Info, XCircle, XOctagon } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 
 const LogTable = ({ logs, autoScroll }) => {
@@ -43,6 +44,12 @@ const LogTable = ({ logs, autoScroll }) => {
     });
   };
 
+  const getConfidenceColor = (confidence) => {
+    if (confidence >= 0.9) return 'text-green-600';
+    if (confidence >= 0.7) return 'text-yellow-600';
+    return 'text-orange-600';
+  };
+
   if (logs.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-md p-8 text-center">
@@ -65,7 +72,7 @@ const LogTable = ({ logs, autoScroll }) => {
               <th className="px-4 py-3 text-left text-sm font-semibold">Severity</th>
               <th className="px-4 py-3 text-left text-sm font-semibold">Source</th>
               <th className="px-4 py-3 text-left text-sm font-semibold">Message</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold">ID</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold">AI Prediction</th>
             </tr>
           </thead>
           <tbody>
@@ -93,8 +100,26 @@ const LogTable = ({ logs, autoScroll }) => {
                 <td className="px-4 py-3 text-sm">
                   {log.message}
                 </td>
-                <td className="px-4 py-3 text-xs text-gray-500 font-mono">
-                  #{log.id}
+                <td className="px-4 py-3 text-sm">
+                  {log.ml ? (
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-2">
+                        {log.ml.severity_match ? (
+                          <CheckCircle size={16} className="text-green-600" />
+                        ) : (
+                          <XOctagon size={16} className="text-red-600" />
+                        )}
+                        <span className="font-semibold text-xs uppercase">
+                          {log.ml.predicted_severity}
+                        </span>
+                      </div>
+                      <div className={`text-xs ${getConfidenceColor(log.ml.confidence)}`}>
+                        {(log.ml.confidence * 100).toFixed(1)}% confident
+                      </div>
+                    </div>
+                  ) : (
+                    <span className="text-xs text-gray-400">No ML data</span>
+                  )}
                 </td>
               </tr>
             ))}

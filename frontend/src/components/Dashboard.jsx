@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import socketService from '../services/socketService';
 import FilterBar from './FilterBar';
 import LogTable from './LogTable';
+import MLInsightsCard from './MLInsightsCard'; // NEW IMPORT
 import StatsCard from './StatsCard';
 
 const Dashboard = () => {
@@ -24,6 +25,7 @@ const Dashboard = () => {
   const [selectedSeverity, setSelectedSeverity] = useState('all');
   const [autoScroll, setAutoScroll] = useState(true);
   const [generatorActive, setGeneratorActive] = useState(false);
+  const [mlEnabled, setMlEnabled] = useState(false);  // NEW STATE
 
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
@@ -34,6 +36,7 @@ const Dashboard = () => {
     // Listen for connection success
     socketService.onConnectionSuccess((data) => {
       setIsConnected(true);
+      setMlEnabled(data.ml_enabled || false);  // NEW
       console.log('Connection success:', data);
     });
 
@@ -65,9 +68,10 @@ const Dashboard = () => {
 
   const fetchInitialLogs = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/logs?limit=50`);
+      const response = await axios.get(`${API_URL}/api/logs?limit=50&ml=true`);  // CHANGED: Added ml=true
       if (response.data.status === 'success') {
         setLogs(response.data.data);
+        setMlEnabled(response.data.ml_enabled || false);  // NEW
       }
     } catch (error) {
       console.error('Error fetching initial logs:', error);
@@ -116,6 +120,9 @@ const Dashboard = () => {
     return matchesSearch && matchesSeverity;
   });
 
+  // Calculate ML stats from current logs - NEW
+  const mlStats = stats.ml || null;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 p-6">
       <div className="max-w-7xl mx-auto">
@@ -152,7 +159,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Stats Cards */}
+        {/* Stats Cards Row 1 */}
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
           <StatsCard 
             title="Total Logs" 
@@ -192,6 +199,11 @@ const Dashboard = () => {
           />
         </div>
 
+        {/* ML Insights Card - NEW */}
+        <div className="mb-6">
+          <MLInsightsCard mlStats={mlStats} isMLEnabled={mlEnabled} />
+        </div>
+
         {/* Filter Bar */}
         <FilterBar
           searchTerm={searchTerm}
@@ -205,6 +217,7 @@ const Dashboard = () => {
         <div className="mb-4 flex items-center justify-between">
           <div className="text-white text-sm">
             Showing {filteredLogs.length} of {logs.length} logs
+            {mlEnabled && <span className="ml-2 text-purple-300">🤖 AI Enhanced</span>}
           </div>
           <label className="flex items-center gap-2 text-white cursor-pointer">
             <input
