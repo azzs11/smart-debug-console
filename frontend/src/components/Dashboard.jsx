@@ -5,7 +5,8 @@ import { useEffect, useState } from 'react';
 import socketService from '../services/socketService';
 import FilterBar from './FilterBar';
 import LogTable from './LogTable';
-import MLInsightsCard from './MLInsightsCard'; // NEW IMPORT
+import MLChartsPanel from './MLChartsPanel'; // NEW IMPORT
+import MLInsightsCard from './MLInsightsCard';
 import StatsCard from './StatsCard';
 
 const Dashboard = () => {
@@ -25,7 +26,8 @@ const Dashboard = () => {
   const [selectedSeverity, setSelectedSeverity] = useState('all');
   const [autoScroll, setAutoScroll] = useState(true);
   const [generatorActive, setGeneratorActive] = useState(false);
-  const [mlEnabled, setMlEnabled] = useState(false);  // NEW STATE
+  const [mlEnabled, setMlEnabled] = useState(false);
+  const [showCharts, setShowCharts] = useState(true); // NEW STATE
 
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
@@ -36,7 +38,7 @@ const Dashboard = () => {
     // Listen for connection success
     socketService.onConnectionSuccess((data) => {
       setIsConnected(true);
-      setMlEnabled(data.ml_enabled || false);  // NEW
+      setMlEnabled(data.ml_enabled || false);
       console.log('Connection success:', data);
     });
 
@@ -68,10 +70,10 @@ const Dashboard = () => {
 
   const fetchInitialLogs = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/logs?limit=50&ml=true`);  // CHANGED: Added ml=true
+      const response = await axios.get(`${API_URL}/api/logs?limit=50&ml=true`);
       if (response.data.status === 'success') {
         setLogs(response.data.data);
-        setMlEnabled(response.data.ml_enabled || false);  // NEW
+        setMlEnabled(response.data.ml_enabled || false);
       }
     } catch (error) {
       console.error('Error fetching initial logs:', error);
@@ -120,7 +122,7 @@ const Dashboard = () => {
     return matchesSearch && matchesSeverity;
   });
 
-  // Calculate ML stats from current logs - NEW
+  // Calculate ML stats from current logs
   const mlStats = stats.ml || null;
 
   return (
@@ -143,6 +145,14 @@ const Dashboard = () => {
                   {isConnected ? 'Connected' : 'Disconnected'}
                 </span>
               </div>
+
+              {/* Toggle Charts Button - NEW */}
+              <button
+                onClick={() => setShowCharts(!showCharts)}
+                className="px-6 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-semibold transition-all duration-300"
+              >
+                {showCharts ? '📊 Hide Charts' : '📈 Show Charts'}
+              </button>
 
               {/* Generator Toggle */}
               <button
@@ -199,10 +209,17 @@ const Dashboard = () => {
           />
         </div>
 
-        {/* ML Insights Card - NEW */}
+        {/* ML Insights Card */}
         <div className="mb-6">
           <MLInsightsCard mlStats={mlStats} isMLEnabled={mlEnabled} />
         </div>
+
+        {/* ML Charts Panel - NEW */}
+        {showCharts && (
+          <div className="mb-6">
+            <MLChartsPanel logs={logs} mlStats={mlStats} isMLEnabled={mlEnabled} />
+          </div>
+        )}
 
         {/* Filter Bar */}
         <FilterBar
