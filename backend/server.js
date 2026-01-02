@@ -391,3 +391,19 @@ server.listen(PORT, async () => {
 
 // Periodic ML service health check (every 30 seconds)
 setInterval(checkMLService, 30000);
+
+const { register, logsProcessed } = require('./src/middleware/metrics');
+
+// Metrics endpoint
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
+});
+
+// Track logs when they're created
+io.on('connection', (socket) => {
+  socket.on('send-log', (logData) => {
+    // ... existing code ...
+    logsProcessed.inc({ severity: logData.severity });
+  });
+});

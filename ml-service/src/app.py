@@ -191,4 +191,24 @@ if __name__ == '__main__':
         host=FLASK_HOST,
         port=FLASK_PORT,
         debug=FLASK_DEBUG
-    )
+    )  
+from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
+
+# Metrics
+prediction_counter = Counter('ml_predictions_total', 'Total ML predictions', ['severity'])
+prediction_duration = Histogram('ml_prediction_duration_seconds', 'ML prediction duration')
+prediction_confidence = Histogram('ml_prediction_confidence', 'ML prediction confidence')
+
+@app.route('/metrics')
+def metrics():
+    return Response(generate_latest(), mimetype=CONTENT_TYPE_LATEST)
+
+@app.route('/api/classify', methods=['POST'])
+def classify_log():
+    with prediction_duration.time():
+        # ... existing code ...
+        result = classifier.predict(message)
+        
+        # Track metrics
+        prediction_counter.labels(severity=result['predicted_severity']).inc()
+        prediction_confidence.observe(result['confidence'])
