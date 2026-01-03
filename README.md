@@ -6,6 +6,48 @@ Real-time log monitoring and analysis system with AI-powered error classificatio
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![ML Accuracy](https://img.shields.io/badge/ML%20Accuracy-88%25%2B-brightgreen)
 
+## 📸 Screenshots
+
+### 🎨 Dashboard (React Frontend)
+
+<div align="center">
+
+<img src="./images/dashboard-1.png" alt="Dashboard Overview" width="800"/>
+
+**Main Dashboard View**  
+*Real-time log monitoring with ML-powered severity classification, stats cards, and WebSocket connection status*
+
+<br/>
+
+<img src="./images/dashboard-2.png" alt="ML Analytics" width="800"/>
+
+**ML Analytics & Live Logs**  
+*Interactive visualizations showing ML accuracy, confidence scores, and real-time log stream with AI predictions*
+
+</div>
+
+---
+
+### 📊 Grafana Monitoring
+
+<div align="center">
+
+<img src="./images/grafana-1.png" alt="Grafana Dashboard" width="800"/>
+
+**Grafana Dashboard Overview**  
+*Production-grade monitoring with Prometheus metrics - logs processed per minute, WebSocket connections, and severity distribution*
+
+<br/>
+
+<img src="./images/grafana-2.png" alt="Grafana ML Metrics" width="800"/>
+
+**ML Performance Metrics**  
+*Real-time ML prediction rate, confidence distribution, latency tracking (P99), and classification error monitoring*
+
+</div>
+
+---
+
 ## ✨ Features
 
 - **Real-time Log Streaming**: WebSocket-based live log updates processing 1,000+ logs/minute
@@ -36,10 +78,31 @@ smart-debug-console/
 
 - **Node.js**: v16+ and npm
 - **Python**: v3.8+
-- **Docker** (optional, for Prometheus/Grafana)
+- **Docker Desktop** (for Grafana/Prometheus monitoring)
 - **Git**: For cloning the repository
 
-### 1. Backend Setup
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/Akchhya1108/smart-debug-console.git
+cd smart-debug-console
+```
+
+### 2. Start Monitoring Stack (Optional but Recommended)
+
+```bash
+# Start Prometheus and Grafana
+docker-compose up -d
+
+# Verify containers are running
+docker ps
+```
+
+Access:
+- Grafana: http://localhost:3001 (admin/admin)
+- Prometheus: http://localhost:9090
+
+### 3. Backend Setup
 
 ```bash
 cd backend
@@ -48,9 +111,8 @@ npm run dev
 ```
 
 Server runs on: `http://localhost:5000`
-Metrics endpoint: `http://localhost:5000/metrics`
 
-### 2. ML Service Setup
+### 4. ML Service Setup
 
 ```bash
 cd ml-service
@@ -75,9 +137,8 @@ python src/app.py
 ```
 
 ML Service runs on: `http://localhost:5001`
-Metrics endpoint: `http://localhost:5001/metrics`
 
-### 3. Frontend Setup
+### 5. Frontend Setup
 
 ```bash
 cd frontend
@@ -86,17 +147,6 @@ npm start
 ```
 
 Frontend runs on: `http://localhost:3000`
-
-### 4. Monitoring Setup (Optional)
-
-```bash
-# Start Prometheus and Grafana
-docker-compose up -d
-
-# Access dashboards
-# Grafana: http://localhost:3001 (admin/admin)
-# Prometheus: http://localhost:9090
-```
 
 ## 📊 ML Model Performance
 
@@ -145,70 +195,9 @@ Content-Type: application/json
 }
 ```
 
-**Response with ML enrichment:**
-```json
-{
-  "status": "success",
-  "data": {
-    "id": "uuid",
-    "message": "Database connection failed",
-    "severity": "error",
-    "source": "database-service",
-    "timestamp": "2025-01-03T10:30:45.123Z",
-    "ml": {
-      "predicted_severity": "error",
-      "confidence": 0.92,
-      "probabilities": {
-        "critical": 0.05,
-        "error": 0.92,
-        "warning": 0.02,
-        "info": 0.01,
-        "debug": 0.00
-      },
-      "severity_match": true
-    }
-  }
-}
-```
-
-#### Get Logs by Severity
-```bash
-GET /api/logs/severity/error
-```
-
 #### Get Statistics
 ```bash
 GET /api/logs/stats
-```
-
-**Response:**
-```json
-{
-  "status": "success",
-  "data": {
-    "total": 1234,
-    "bySeverity": {
-      "critical": 45,
-      "error": 234,
-      "warning": 456,
-      "info": 389,
-      "debug": 110
-    },
-    "ml": {
-      "total_classified": 1234,
-      "correct_predictions": 1087,
-      "accuracy": "88.08",
-      "avg_confidence": "91.25"
-    }
-  }
-}
-```
-
-#### Start/Stop Log Generator
-```bash
-POST /api/logs/generator/start
-POST /api/logs/generator/stop
-GET /api/logs/generator/status
 ```
 
 ### ML Service API (Port 5001)
@@ -223,25 +212,6 @@ Content-Type: application/json
 }
 ```
 
-**Response:**
-```json
-{
-  "status": "success",
-  "data": {
-    "message": "Error connecting to database",
-    "predicted_severity": "error",
-    "confidence": 0.92,
-    "probabilities": {
-      "critical": 0.05,
-      "error": 0.92,
-      "warning": 0.02,
-      "info": 0.01,
-      "debug": 0.00
-    }
-  }
-}
-```
-
 #### Classify Batch
 ```bash
 POST /api/classify/batch
@@ -253,89 +223,6 @@ Content-Type: application/json
     "User logged in successfully"
   ]
 }
-```
-
-#### Model Info
-```bash
-GET /api/model/info
-```
-
-## 🔌 WebSocket Events
-
-### Client → Server
-- `send-log`: Send a new log entry
-
-### Server → Client
-- `connection-success`: Connection established with ML status
-- `new-log`: New log entry available (with ML predictions)
-- `log-stats`: Updated statistics including ML accuracy
-
-## 🎨 Frontend Features
-
-### Dashboard Components
-- **Stats Cards**: Overview of log counts by severity with color coding
-- **ML Insights Card**: Real-time ML accuracy, confidence, and prediction metrics
-- **ML Charts Panel**: Interactive visualizations including:
-  - Accuracy over time (Line chart)
-  - Confidence distribution (Bar chart)
-  - Severity distribution (Pie chart)
-  - Model performance stats
-- **Filter Bar**: Search and filter capabilities
-- **Log Table**: Real-time log display with:
-  - Color-coded severity levels
-  - ML prediction results
-  - Confidence scores
-  - Match indicators
-- **Connection Status**: WebSocket connection indicator
-- **Log Generator Control**: Start/stop test log generation
-
-### Severity Color Coding
-- 🔴 **Critical**: Red (system-critical issues)
-- 🟠 **Error**: Orange (errors requiring attention)
-- 🟡 **Warning**: Yellow (warnings and alerts)
-- 🔵 **Info**: Blue (informational messages)
-- ⚪ **Debug**: Gray (debug information)
-
-## 📊 Grafana Dashboards
-
-Pre-built dashboards include:
-
-1. **📊 Logs Processed per Minute** - Real-time log throughput by severity
-2. **⚡ ML Prediction Latency (P99)** - Sub-millisecond prediction times
-3. **🔌 Active WebSocket Connections** - Connection monitoring
-4. **🤖 ML Predictions per Minute** - AI classification rate
-5. **🎯 ML Prediction Confidence Distribution** - Confidence score analytics
-6. **❌ ML Classification Errors** - Error rate monitoring
-7. **📈 Total Logs by Severity** - Distribution pie chart
-8. **⏱️ ML Prediction Duration** - P50 & P95 latencies
-9. **💻 CPU Usage** - System resource monitoring
-10. **🧠 Memory Usage** - Memory consumption tracking
-
-Access Grafana at `http://localhost:3001` (default credentials: admin/admin)
-
-## 🛠️ Configuration
-
-### Backend (.env)
-```env
-PORT=5000
-NODE_ENV=development
-CORS_ORIGIN=http://localhost:3000
-ML_SERVICE_URL=http://localhost:5001
-```
-
-### ML Service (.env)
-```env
-FLASK_PORT=5001
-FLASK_HOST=0.0.0.0
-FLASK_ENV=development
-MODEL_PATH=models/log_classifier.pkl
-TRAINING_DATA_SIZE=5000
-```
-
-### Frontend (.env)
-```env
-REACT_APP_API_URL=http://localhost:5000
-REACT_APP_WS_URL=http://localhost:5000
 ```
 
 ## 📦 Tech Stack
@@ -369,84 +256,47 @@ REACT_APP_WS_URL=http://localhost:5000
 - **Prometheus** - Metrics collection and storage
 - **Grafana** - Metrics visualization and dashboarding
 
-## 🔄 Integration Guide
+## 🔧 Configuration
 
-### Sending Logs from Your Application
-
-**JavaScript/Node.js:**
-```javascript
-const axios = require('axios');
-
-async function sendLog(message, severity, source) {
-  await axios.post('http://localhost:5000/api/logs', {
-    message,
-    severity,
-    source
-  });
-}
-
-// Usage
-sendLog('Database connection failed', 'error', 'my-app');
+### Backend (.env)
+```env
+PORT=5000
+NODE_ENV=development
+CORS_ORIGIN=http://localhost:3000
+ML_SERVICE_URL=http://localhost:5001
 ```
 
-**Python:**
-```python
-import requests
-
-def send_log(message, severity, source):
-    requests.post('http://localhost:5000/api/logs', json={
-        'message': message,
-        'severity': severity,
-        'source': source
-    })
-
-# Usage
-send_log('Database connection failed', 'error', 'my-app')
+### ML Service (.env)
+```env
+FLASK_PORT=5001
+FLASK_HOST=0.0.0.0
+FLASK_ENV=development
+MODEL_PATH=models/log_classifier.pkl
+TRAINING_DATA_SIZE=5000
 ```
 
-**cURL:**
-```bash
-curl -X POST http://localhost:5000/api/logs \
-  -H "Content-Type: application/json" \
-  -d '{
-    "message": "Database connection failed",
-    "severity": "error",
-    "source": "my-app"
-  }'
+### Frontend (.env)
+```env
+REACT_APP_API_URL=http://localhost:5000
+REACT_APP_WS_URL=http://localhost:5000
 ```
 
-## 🧪 Testing
+## 📊 Grafana Dashboards
 
-### Test ML Model
-```bash
-cd ml-service
-python src/classifier.py
-```
+Pre-built dashboards include:
 
-### Load Testing
-```bash
-cd backend
+1. **📊 Logs Processed per Minute** - Real-time log throughput by severity
+2. **⚡ ML Prediction Latency (P99)** - Sub-millisecond prediction times
+3. **🔌 Active WebSocket Connections** - Connection monitoring
+4. **🤖 ML Predictions per Minute** - AI classification rate
+5. **🎯 ML Prediction Confidence Distribution** - Confidence score analytics
+6. **❌ ML Classification Errors** - Error rate monitoring
+7. **📈 Total Logs by Severity** - Distribution pie chart
+8. **⏱️ ML Prediction Duration** - P50 & P95 latencies
+9. **💻 CPU Usage** - System resource monitoring
+10. **🧠 Memory Usage** - Memory consumption tracking
 
-# Single client load test (1,200 logs/min)
-node test-load.js
-
-# Multi-client test (10 clients, 1,000 logs/min total)
-node test-load-multi.js
-```
-
-### Test ML Integration
-```bash
-cd backend
-node test-ml.js
-```
-
-### Manual Log Testing
-```bash
-# Send a test log
-curl -X POST http://localhost:5000/api/logs \
-  -H "Content-Type: application/json" \
-  -d '{"message":"Test error","severity":"error","source":"test"}'
-```
+Access Grafana at `http://localhost:3001` (default credentials: admin/admin)
 
 ## 📈 Performance Metrics
 
@@ -456,30 +306,16 @@ curl -X POST http://localhost:5000/api/logs \
 - **Accuracy**: 88%+ ML classification accuracy
 - **Confidence**: 91%+ average prediction confidence
 
-## 📈 Future Enhancements
-
-- [ ] Log persistence (PostgreSQL/MongoDB integration)
-- [ ] Advanced analytics and trend detection
-- [ ] Alert notifications (Email, Slack, PagerDuty)
-- [ ] Log export (CSV, JSON, PDF)
-- [ ] Custom severity levels and rules
-- [ ] Multi-user support with authentication
-- [ ] Log aggregation from multiple sources
-- [ ] Anomaly detection using unsupervised learning
-- [ ] ML model retraining interface
-- [ ] Natural language queries for log search
-- [ ] Log correlation and pattern detection
-- [ ] Integration with popular logging frameworks
-
 ## 🐛 Troubleshooting
 
 ### Backend won't start
 ```bash
 # Check if port 5000 is available
-lsof -i :5000  # macOS/Linux
-netstat -ano | findstr :5000  # Windows
+# Windows:
+netstat -ano | findstr :5000
 
 # Kill process if needed
+taskkill /PID <PID> /F
 ```
 
 ### ML Service errors
@@ -494,43 +330,24 @@ python src/train_model.py
 - Check CORS settings in backend
 - Verify `.env` file in frontend
 
-### WebSocket not connecting
-- Check firewall settings
-- Ensure Socket.io versions match
-- Check browser console for errors
-
 ### Grafana dashboard not showing data
 - Verify Prometheus is scraping metrics: `http://localhost:9090/targets`
 - Check backend/ML service metrics endpoints are accessible
-- Ensure services are configured with correct labels
+- Ensure log generator is running
+- Wait 30 seconds for metrics to populate
 
-## 📝 Development
+## 📈 Future Enhancements
 
-### Run in Development Mode
-
-**Terminal 1 - Backend:**
-```bash
-cd backend
-npm run dev  # Uses nodemon for auto-restart
-```
-
-**Terminal 2 - ML Service:**
-```bash
-cd ml-service
-source venv/bin/activate  # Windows: venv\Scripts\activate
-python src/app.py
-```
-
-**Terminal 3 - Frontend:**
-```bash
-cd frontend
-npm start  # Hot reload enabled
-```
-
-**Terminal 4 - Monitoring (Optional):**
-```bash
-docker-compose up -d
-```
+- [ ] Log persistence (PostgreSQL/MongoDB integration)
+- [ ] Advanced analytics and trend detection
+- [ ] Alert notifications (Email, Slack, PagerDuty)
+- [ ] Log export (CSV, JSON, PDF)
+- [ ] Custom severity levels and rules
+- [ ] Multi-user support with authentication
+- [ ] Log aggregation from multiple sources
+- [ ] Anomaly detection using unsupervised learning
+- [ ] ML model retraining interface
+- [ ] Natural language queries for log search
 
 ## 📄 License
 
@@ -556,4 +373,4 @@ MIT License - Free for personal and commercial use
 
 🐛 **Found a bug?** Open an issue  
 💡 **Have an idea?** Submit a pull request  
-📖 **Questions?** Check the [Wiki](https://github.com/Akchhya1108/smart-debug-console/wiki) or open a discussion
+📖 **Questions?** Open a discussion
