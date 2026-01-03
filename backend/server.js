@@ -5,6 +5,7 @@ const socketIo = require('socket.io');
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 const axios = require('axios');
+const { register, logsProcessed, activeConnections } = require('./src/middleware/metrics');
 
 const app = express();
 const server = http.createServer(app);
@@ -121,6 +122,9 @@ function updateMLStats(log) {
 io.on('connection', async (socket) => {
   console.log('✅ Client connected:', socket.id);
   
+  // Update active connections metric
+  activeConnections.inc();
+  
   // Check ML service on connection
   const mlAvailable = await checkMLService();
   
@@ -132,6 +136,7 @@ io.on('connection', async (socket) => {
 
   socket.on('disconnect', () => {
     console.log('❌ Client disconnected:', socket.id);
+    activeConnections.dec();
   });
 
   socket.on('send-log', async (logData) => {
@@ -171,6 +176,9 @@ async function createLog(logData) {
     stats.bySeverity[log.severity]++;
   }
 
+  // Track Prometheus metrics
+  logsProcessed.inc({ severity: log.severity });
+
   // Store log
   logs.push(log);
   if (logs.length > 1000) {
@@ -183,6 +191,12 @@ async function createLog(logData) {
 
   return log;
 }
+
+// ==================== PROMETHEUS METRICS ENDPOINT ====================
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
+});
 
 // Routes
 app.get('/health', (req, res) => {
@@ -382,6 +396,7 @@ server.listen(PORT, async () => {
   console.log('='.repeat(60));
   console.log(`🌐 Server running on: http://localhost:${PORT}`);
   console.log(`🔌 WebSocket ready for connections`);
+  console.log(`📊 Prometheus metrics: http://localhost:${PORT}/metrics`);
   
   // Check ML service on startup
   await checkMLService();
@@ -391,19 +406,3 @@ server.listen(PORT, async () => {
 
 // Periodic ML service health check (every 30 seconds)
 setInterval(checkMLService, 30000);
-
-const { register, logsProcessed } = require('./src/middleware/metrics');
-
-// Metrics endpoint
-app.get('/metrics', async (req, res) => {
-  res.set('Content-Type', register.contentType);
-  res.end(await register.metrics());
-});
-
-// Track logs when they're created
-io.on('connection', (socket) => {
-  socket.on('send-log', (logData) => {
-    // ... existing code ...
-    logsProcessed.inc({ severity: logData.severity });
-  });
-});
