@@ -12,14 +12,14 @@ Real-time log monitoring and analysis system with AI-powered error classificatio
 
 <div align="center">
 
-<img src="./images/dashboard-1.png" alt="Dashboard Overview" width="800"/>
+<img src="./images/Dashboard-1.png" alt="Dashboard Overview" width="800"/>
 
 **Main Dashboard View**  
 *Real-time log monitoring with ML-powered severity classification, stats cards, and WebSocket connection status*
 
 <br/>
 
-<img src="./images/dashboard-2.png" alt="ML Analytics" width="800"/>
+<img src="./images/Dashboard-2.png" alt="ML Analytics" width="800"/>
 
 **ML Analytics & Live Logs**  
 *Interactive visualizations showing ML accuracy, confidence scores, and real-time log stream with AI predictions*
@@ -32,14 +32,14 @@ Real-time log monitoring and analysis system with AI-powered error classificatio
 
 <div align="center">
 
-<img src="./images/grafana-1.png" alt="Grafana Dashboard" width="800"/>
+<img src="./images/Grafana-1.png" alt="Grafana Dashboard" width="800"/>
 
 **Grafana Dashboard Overview**  
 *Production-grade monitoring with Prometheus metrics - logs processed per minute, WebSocket connections, and severity distribution*
 
 <br/>
 
-<img src="./images/grafana-2.png" alt="Grafana ML Metrics" width="800"/>
+<img src="./images/Grafana-2.png" alt="Grafana ML Metrics" width="800"/>
 
 **ML Performance Metrics**  
 *Real-time ML prediction rate, confidence distribution, latency tracking (P99), and classification error monitoring*
