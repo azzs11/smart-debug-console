@@ -1,0 +1,20 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # Backend Node.js service
+  - job_name: 'backend'
+    static_configs:
+      - targets: ['host.docker.internal:5000']
+        labels:
+          service: 'backend'
+          environment: 'development'
+
+  # ML Flask service
+  - job_name: 'ml-service'
+    static_configs:
+      - targets: ['host.docker.internal:5001']
+        labels:
+          service: 'ml-service'
+          environment: 'development'
