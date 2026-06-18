@@ -1,254 +1,76 @@
-// frontend/src/components/Dashboard.jsx
-import axios from 'axios';
-import { Activity, AlertCircle, AlertTriangle, Database, Info, Wifi, WifiOff } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import socketService from '../services/socketService';
-import FilterBar from './FilterBar';
-import LogTable from './LogTable';
-import MLChartsPanel from './MLChartsPanel'; // NEW IMPORT
-import MLInsightsCard from './MLInsightsCard';
+import { useState } from 'react';
+import { Database, AlertCircle, AlertTriangle, Info, Bug, ChevronDown, ChevronUp, Activity } from 'lucide-react';
 import StatsCard from './StatsCard';
+import LogStream from './LogStream';
+import CausalChainPanel from './CausalChainPanel';
+import AnomalyTimeline from './AnomalyTimeline';
+import MLChartsPanel from './MLChartsPanel';
 
-const Dashboard = () => {
-  const [logs, setLogs] = useState([]);
-  const [stats, setStats] = useState({
-    total: 0,
-    bySeverity: {
-      critical: 0,
-      error: 0,
-      warning: 0,
-      info: 0,
-      debug: 0
-    }
-  });
-  const [isConnected, setIsConnected] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedSeverity, setSelectedSeverity] = useState('all');
-  const [autoScroll, setAutoScroll] = useState(true);
-  const [generatorActive, setGeneratorActive] = useState(false);
-  const [mlEnabled, setMlEnabled] = useState(false);
-  const [showCharts, setShowCharts] = useState(true); // NEW STATE
+const Dashboard = ({ logs, stats, causalChains, anomalies, mlStats, isMLEnabled, onClearLogs }) => {
+  const [showML, setShowML] = useState(true);
 
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-
-  useEffect(() => {
-    // Connect to WebSocket
-    socketService.connect();
-
-    // Listen for connection success
-    socketService.onConnectionSuccess((data) => {
-      setIsConnected(true);
-      setMlEnabled(data.ml_enabled || false);
-      console.log('Connection success:', data);
-    });
-
-    // Listen for new logs
-    socketService.onNewLog((log) => {
-      setLogs(prevLogs => {
-        const newLogs = [...prevLogs, log];
-        // Keep only last 100 logs in UI
-        return newLogs.slice(-100);
-      });
-    });
-
-    // Listen for stats updates
-    socketService.onStatsUpdate((statsData) => {
-      setStats(statsData);
-    });
-
-    // Fetch initial logs
-    fetchInitialLogs();
-
-    // Check generator status
-    checkGeneratorStatus();
-
-    // Cleanup on unmount
-    return () => {
-      socketService.disconnect();
-    };
-  }, []);
-
-  const fetchInitialLogs = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/api/logs?limit=50&ml=true`);
-      if (response.data.status === 'success') {
-        setLogs(response.data.data);
-        setMlEnabled(response.data.ml_enabled || false);
-      }
-    } catch (error) {
-      console.error('Error fetching initial logs:', error);
-    }
-  };
-
-  const checkGeneratorStatus = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/api/logs/generator/status`);
-      if (response.data.status === 'success') {
-        setGeneratorActive(response.data.data.isActive);
-      }
-    } catch (error) {
-      console.error('Error checking generator status:', error);
-    }
-  };
-
-  const toggleGenerator = async () => {
-    try {
-      const endpoint = generatorActive ? 'stop' : 'start';
-      const response = await axios.post(`${API_URL}/api/logs/generator/${endpoint}`, {
-        interval: 2000
-      });
-      
-      if (response.data.status === 'success') {
-        setGeneratorActive(!generatorActive);
-      }
-    } catch (error) {
-      console.error('Error toggling generator:', error);
-    }
-  };
-
-  const clearLogs = () => {
-    setLogs([]);
-    setStats({
-      total: 0,
-      bySeverity: { critical: 0, error: 0, warning: 0, info: 0, debug: 0 }
-    });
-  };
-
-  // Filter logs based on search and severity
-  const filteredLogs = logs.filter(log => {
-    const matchesSearch = log.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         log.source.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesSeverity = selectedSeverity === 'all' || log.severity === selectedSeverity;
-    return matchesSearch && matchesSeverity;
-  });
-
-  // Calculate ML stats from current logs
-  const mlStats = stats.ml || null;
+  const bySev = stats?.bySeverity || {};
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-4xl font-bold text-white mb-2">
-                🔍 Smart Debug Console
-              </h1>
-              <p className="text-gray-300">Real-time log monitoring with AI-powered analysis</p>
-            </div>
-            <div className="flex items-center gap-4">
-              {/* Connection Status */}
-              <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${isConnected ? 'bg-green-500' : 'bg-red-500'} text-white`}>
-                {isConnected ? <Wifi size={20} /> : <WifiOff size={20} />}
-                <span className="font-semibold">
-                  {isConnected ? 'Connected' : 'Disconnected'}
-                </span>
-              </div>
+    <div className="space-y-5">
+      {/* Row 1: Stats cards */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <StatsCard title="Total Logs" value={stats?.total || 0} icon={<Database size={20} />} color="blue" />
+        <StatsCard title="Critical"   value={bySev.critical || 0} icon={<AlertCircle size={20} />} color="red"
+          glow={(bySev.critical || 0) > 0} />
+        <StatsCard title="Errors"     value={bySev.error    || 0} icon={<AlertCircle size={20} />} color="orange" />
+        <StatsCard title="Warnings"   value={bySev.warning  || 0} icon={<AlertTriangle size={20} />} color="yellow" />
+        <StatsCard title="Info"       value={bySev.info     || 0} icon={<Info size={20} />} color="blue" />
+        <StatsCard title="Debug"      value={bySev.debug    || 0} icon={<Bug size={20} />} color="gray" />
+      </div>
 
-              {/* Toggle Charts Button - NEW */}
-              <button
-                onClick={() => setShowCharts(!showCharts)}
-                className="px-6 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-semibold transition-all duration-300"
-              >
-                {showCharts ? '📊 Hide Charts' : '📈 Show Charts'}
-              </button>
+      {/* Row 2: Anomaly stats */}
+      {(stats?.anomalyCount > 0 || stats?.causalChainCount > 0) && (
+        <div className="grid grid-cols-2 gap-3">
+          <StatsCard title="Anomalies Detected" value={stats?.anomalyCount || 0} icon={<Activity size={20} />} color="yellow"
+            subtitle="Temporal rhythm breaks" />
+          <StatsCard title="Causal Chains" value={stats?.causalChainCount || 0} icon={<Activity size={20} />} color="purple"
+            subtitle="Active root-cause chains" />
+        </div>
+      )}
 
-              {/* Generator Toggle */}
-              <button
-                onClick={toggleGenerator}
-                className={`px-6 py-2 rounded-lg font-semibold transition-all duration-300 ${
-                  generatorActive 
-                    ? 'bg-red-500 hover:bg-red-600 text-white' 
-                    : 'bg-green-500 hover:bg-green-600 text-white'
-                }`}
-              >
-                {generatorActive ? '⏸️ Stop Generator' : '▶️ Start Generator'}
-              </button>
-            </div>
-          </div>
+      {/* Row 3: Log stream + Causal panel */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4" style={{ minHeight: 480 }}>
+        {/* Terminal log stream — 60% */}
+        <div className="lg:col-span-3">
+          <LogStream logs={logs} onClear={onClearLogs} maxHeight={480} />
         </div>
 
-        {/* Stats Cards Row 1 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-          <StatsCard 
-            title="Total Logs" 
-            value={stats.total || filteredLogs.length} 
-            icon={<Database />} 
-            color="blue" 
-          />
-          <StatsCard 
-            title="Critical" 
-            value={stats.bySeverity?.critical || 0} 
-            icon={<AlertCircle />} 
-            color="red" 
-          />
-          <StatsCard 
-            title="Errors" 
-            value={stats.bySeverity?.error || 0} 
-            icon={<AlertCircle />} 
-            color="red" 
-          />
-          <StatsCard 
-            title="Warnings" 
-            value={stats.bySeverity?.warning || 0} 
-            icon={<AlertTriangle />} 
-            color="yellow" 
-          />
-          <StatsCard 
-            title="Info" 
-            value={stats.bySeverity?.info || 0} 
-            icon={<Info />} 
-            color="green" 
-          />
-          <StatsCard 
-            title="Debug" 
-            value={stats.bySeverity?.debug || 0} 
-            icon={<Activity />} 
-            color="gray" 
-          />
+        {/* Causal chain panel — 40% */}
+        <div className="lg:col-span-2" style={{ minHeight: 480 }}>
+          <CausalChainPanel chains={causalChains} />
         </div>
+      </div>
 
-        {/* ML Insights Card */}
-        <div className="mb-6">
-          <MLInsightsCard mlStats={mlStats} isMLEnabled={mlEnabled} />
-        </div>
+      {/* Row 4: Anomaly timeline */}
+      {anomalies.length > 0 && (
+        <AnomalyTimeline anomalies={anomalies} />
+      )}
 
-        {/* ML Charts Panel - NEW */}
-        {showCharts && (
-          <div className="mb-6">
-            <MLChartsPanel logs={logs} mlStats={mlStats} isMLEnabled={mlEnabled} />
+      {/* Row 5: ML analytics (collapsible) */}
+      <div className="card">
+        <button
+          onClick={() => setShowML(s => !s)}
+          className="flex items-center gap-2 w-full text-left"
+        >
+          <span className="font-semibold text-text-primary text-sm">ML Analytics</span>
+          {isMLEnabled && (
+            <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-accent-secondary/20 text-accent-secondary border border-accent-secondary/30">ACTIVE</span>
+          )}
+          <span className="ml-auto text-text-muted">
+            {showML ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </span>
+        </button>
+        {showML && (
+          <div className="mt-4">
+            <MLChartsPanel logs={logs} mlStats={mlStats} isMLEnabled={isMLEnabled} />
           </div>
         )}
-
-        {/* Filter Bar */}
-        <FilterBar
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          selectedSeverity={selectedSeverity}
-          setSelectedSeverity={setSelectedSeverity}
-          onClearLogs={clearLogs}
-        />
-
-        {/* Auto-scroll Toggle */}
-        <div className="mb-4 flex items-center justify-between">
-          <div className="text-white text-sm">
-            Showing {filteredLogs.length} of {logs.length} logs
-            {mlEnabled && <span className="ml-2 text-purple-300">🤖 AI Enhanced</span>}
-          </div>
-          <label className="flex items-center gap-2 text-white cursor-pointer">
-            <input
-              type="checkbox"
-              checked={autoScroll}
-              onChange={(e) => setAutoScroll(e.target.checked)}
-              className="w-4 h-4 cursor-pointer"
-            />
-            <span>Auto-scroll</span>
-          </label>
-        </div>
-
-        {/* Log Table */}
-        <LogTable logs={filteredLogs} autoScroll={autoScroll} />
       </div>
     </div>
   );
