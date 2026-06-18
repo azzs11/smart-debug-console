@@ -8,6 +8,7 @@ import CausalGraph from './components/CausalGraph';
 import AnomalyTimeline from './components/AnomalyTimeline';
 import MLChartsPanel from './components/MLChartsPanel';
 import ToastContainer from './components/Toast';
+import Onboarding from './components/Onboarding';
 import socketService from './services/socketService';
 
 const API = process.env.REACT_APP_API_URL || 'http://localhost:5000';
@@ -31,6 +32,7 @@ function App() {
   const [mlEnabled,     setMlEnabled]     = useState(false);
   const [toasts,        setToasts]        = useState([]);
   const [adminKey,      setAdminKey]      = useState(() => sessionStorage.getItem('adminKey') || '');
+  const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem('chronolog_onboarded'));
 
   // ── Logs/min tracking ──────────────────────────────────────────────────────
   const logTimestamps   = useRef([]);
@@ -353,6 +355,13 @@ function App() {
       </div>
 
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
+
+      {showOnboarding && (
+        <Onboarding onClose={() => {
+          localStorage.setItem('chronolog_onboarded', '1');
+          setShowOnboarding(false);
+        }} />
+      )}
     </div>
   );
 }

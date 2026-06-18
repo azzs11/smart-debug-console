@@ -1,23 +1,26 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --bg-base:     #0a0e1a;
-  --bg-surface:  #111827;
-  --bg-elevated: #1f2937;
-  --accent-primary:   #6366f1;
-  --accent-secondary: #8b5cf6;
-  --accent-success:   #10b981;
-  --accent-warning:   #f59e0b;
-  --accent-danger:    #ef4444;
-  --accent-critical:  #dc2626;
-  --text-primary:   #f9fafb;
-  --text-secondary: #9ca3af;
-  --text-muted:     #4b5563;
-  --border:         #1f2937;
+  /* ── Deep Forest Dark — inspired by WisprFlow ── */
+  --bg-base:     #080d0b;
+  --bg-surface:  #0f1a14;
+  --bg-elevated: #172b1e;
+
+  --accent-primary:   #22d3a5;
+  --accent-secondary: #c4b5fd;
+  --accent-success:   #22d3a5;
+  --accent-warning:   #fbbf24;
+  --accent-danger:    #f87171;
+  --accent-critical:  #ef4444;
+
+  --text-primary:   #f0faf5;
+  --text-secondary: #86a898;
+  --text-muted:     #3d5a4a;
+  --border:         #1a3528;
 }
 
 * { box-sizing: border-box; }
@@ -32,11 +35,14 @@ html, body, #root {
   -webkit-font-smoothing: antialiased;
 }
 
+/* ── Display / heading font ─────────────────────────────────────── */
+.font-display { font-family: 'Fraunces', Georgia, serif; }
+
 /* ── Custom scrollbar ───────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-base); }
 ::-webkit-scrollbar-thumb { background: var(--bg-elevated); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #374151; }
+::-webkit-scrollbar-thumb:hover { background: #244035; }
 
 /* ── Log stream animations ──────────────────────────────────────── */
 @keyframes logSlide {
@@ -52,9 +58,9 @@ html, body, #root {
 .log-critical-flash { animation: criticalFlash 0.6s ease-out; }
 
 /* ── Glow utilities ─────────────────────────────────────────────── */
-.glow-red    { box-shadow: 0 0 20px rgba(239,68,68,0.4); }
-.glow-indigo { box-shadow: 0 0 20px rgba(99,102,241,0.3); }
-.glow-green  { box-shadow: 0 0 20px rgba(16,185,129,0.3); }
+.glow-red   { box-shadow: 0 0 20px rgba(239,68,68,0.4); }
+.glow-teal  { box-shadow: 0 0 24px rgba(34,211,165,0.25); }
+.glow-green { box-shadow: 0 0 20px rgba(34,211,165,0.3); }
 
 /* ── App shell layout ───────────────────────────────────────────── */
 .app-shell {
@@ -104,7 +110,7 @@ html, body, #root {
 
 /* ── Terminal log stream ────────────────────────────────────────── */
 .log-stream {
-  background: #0a0e1a;
+  background: var(--bg-base);
   border-radius: 8px;
   border: 1px solid var(--border);
   overflow: hidden;
@@ -137,7 +143,7 @@ html, body, #root {
 }
 
 .log-row:hover {
-  background: rgba(255,255,255,0.04);
+  background: rgba(34,211,165,0.04);
   border-left-color: var(--accent-primary);
 }
 
@@ -167,3 +173,15 @@ html, body, #root {
 }
 .toast-enter { animation: toastIn  0.3s ease-out; }
 .toast-exit  { animation: toastOut 0.3s ease-out forwards; }
+
+/* ── Onboarding backdrop ────────────────────────────────────────── */
+@keyframes backdropIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+.onboarding-backdrop { animation: backdropIn 0.25s ease-out; }
+.onboarding-modal    { animation: modalIn    0.3s ease-out;  }
