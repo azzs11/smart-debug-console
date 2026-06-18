@@ -1,4 +1,4 @@
-import { Wifi, WifiOff, Brain, Settings } from 'lucide-react';
+import { Brain, Settings } from 'lucide-react';
 
 const SparkLine = ({ data = [], color = '#6366f1' }) => {
   if (data.length < 2) return <div className="w-16 h-4" />;

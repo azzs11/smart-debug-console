@@ -3,7 +3,7 @@ import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
-import { Brain, TrendingUp, Target, Zap, BarChart3 } from 'lucide-react';
+import { Brain, TrendingUp, Target, BarChart3 } from 'lucide-react';
 
 const CONFIDENCE_COLORS = { 'High (90%+)': '#10b981', 'Medium (70-89%)': '#f59e0b', 'Low (<70%)': '#ef4444' };
 const SEVERITY_PIE_COLORS = { critical: '#dc2626', error: '#f97316', warning: '#f59e0b', info: '#3b82f6', debug: '#6b7280' };

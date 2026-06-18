@@ -22,6 +22,60 @@ services:
       - monitoring
     restart: unless-stopped
 
+  ml-service:
+    build: ./ml-service
+    container_name: chronolog_ml
+    ports:
+      - "5001:5001"
+    networks:
+      - monitoring
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  backend:
+    build: ./backend
+    container_name: chronolog_backend
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: postgresql://debug_user:${POSTGRES_PASSWORD:-debug_secret}@postgres:5432/smart_debug
+      ML_SERVICE_URL: http://ml-service:5001
+      CORS_ORIGIN: http://localhost:3000
+      ADMIN_API_KEY: ${ADMIN_API_KEY:-dev_key_change_in_prod}
+      NODE_ENV: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ml-service:
+        condition: service_healthy
+    networks:
+      - monitoring
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        REACT_APP_API_URL: http://localhost:5000
+        REACT_APP_WS_URL: http://localhost:5000
+    container_name: chronolog_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - monitoring
+    restart: unless-stopped
+
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
@@ -45,9 +99,9 @@ services:
     ports:
       - "3001:3000"
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-      - GF_USERS_ALLOW_SIGN_UP=false
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
     volumes:
       - grafana_data:/var/lib/grafana
       - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
