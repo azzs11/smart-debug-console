@@ -5,22 +5,22 @@
 @tailwind utilities;
 
 :root {
-  /* ── Deep Forest Dark — inspired by WisprFlow ── */
-  --bg-base:     #080d0b;
-  --bg-surface:  #0f1a14;
-  --bg-elevated: #172b1e;
+  /* ── WisprFlow Cream — warm light theme ── */
+  --bg-base:     #f7f0e6;
+  --bg-surface:  #fdf8f2;
+  --bg-elevated: #ede4d8;
 
-  --accent-primary:   #22d3a5;
-  --accent-secondary: #c4b5fd;
-  --accent-success:   #22d3a5;
-  --accent-warning:   #fbbf24;
-  --accent-danger:    #f87171;
-  --accent-critical:  #ef4444;
+  --accent-primary:   #0d3d2e;
+  --accent-secondary: #6d28d9;
+  --accent-success:   #065f46;
+  --accent-warning:   #92400e;
+  --accent-danger:    #991b1b;
+  --accent-critical:  #7f1d1d;
 
-  --text-primary:   #f0faf5;
-  --text-secondary: #86a898;
-  --text-muted:     #3d5a4a;
-  --border:         #1a3528;
+  --text-primary:   #0f1a14;
+  --text-secondary: #4b5563;
+  --text-muted:     #9ca3af;
+  --border:         #d4c9ba;
 }
 
 * { box-sizing: border-box; }
@@ -41,8 +41,8 @@ html, body, #root {
 /* ── Custom scrollbar ───────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-base); }
-::-webkit-scrollbar-thumb { background: var(--bg-elevated); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #244035; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #b8aa98; }
 
 /* ── Log stream animations ──────────────────────────────────────── */
 @keyframes logSlide {
@@ -57,10 +57,10 @@ html, body, #root {
 }
 .log-critical-flash { animation: criticalFlash 0.6s ease-out; }
 
-/* ── Glow utilities ─────────────────────────────────────────────── */
-.glow-red   { box-shadow: 0 0 20px rgba(239,68,68,0.4); }
-.glow-teal  { box-shadow: 0 0 24px rgba(34,211,165,0.25); }
-.glow-green { box-shadow: 0 0 20px rgba(34,211,165,0.3); }
+/* ── Shadow utilities (replaces dark-theme glows) ───────────────── */
+.glow-red   { box-shadow: 0 4px 16px rgba(185,28,28,0.18); }
+.glow-teal  { box-shadow: 0 4px 16px rgba(13,61,46,0.15); }
+.glow-green { box-shadow: 0 4px 16px rgba(13,61,46,0.15); }
 
 /* ── App shell layout ───────────────────────────────────────────── */
 .app-shell {
@@ -83,24 +83,23 @@ html, body, #root {
   padding: 24px;
 }
 
-/* ── Sidebar ────────────────────────────────────────────────────── */
+/* ── Sidebar — always dark ──────────────────────────────────────── */
 .sidenav {
-  width: 220px;
   flex-shrink: 0;
-  background: var(--bg-surface);
-  border-right: 1px solid var(--border);
+  background: #0a0d0b;
+  border-right: 1px solid #1c2220;
   display: flex;
   flex-direction: column;
   padding: 16px 0;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
-/* ── TopBar ─────────────────────────────────────────────────────── */
+/* ── TopBar — always dark ───────────────────────────────────────── */
 .topbar {
   height: 60px;
   flex-shrink: 0;
-  background: var(--bg-surface);
-  border-bottom: 1px solid var(--border);
+  background: #0a0d0b;
+  border-bottom: 1px solid #1c2220;
   display: flex;
   align-items: center;
   padding: 0 20px;
@@ -108,11 +107,11 @@ html, body, #root {
   z-index: 50;
 }
 
-/* ── Terminal log stream ────────────────────────────────────────── */
+/* ── Terminal log stream — always dark for readability ──────────── */
 .log-stream {
-  background: var(--bg-base);
+  background: #0f1a14;
   border-radius: 8px;
-  border: 1px solid var(--border);
+  border: 1px solid #1e3528;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -120,11 +119,11 @@ html, body, #root {
 
 .log-stream-header {
   padding: 10px 16px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid #1e3528;
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--bg-surface);
+  background: #172b1e;
 }
 
 .log-stream-body {

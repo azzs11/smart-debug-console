@@ -11,7 +11,7 @@ const SEVERITY_COLORS = {
 };
 
 const BlastRadiusBadge = ({ score }) => (
-  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 text-xs font-mono font-semibold">
+  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-accent-primary/15 border border-accent-primary/25 text-accent-primary text-xs font-mono font-semibold">
     <Zap size={10} />
     {score.toFixed(1)}
   </span>
@@ -76,7 +76,7 @@ const CausalChainPanel = ({ chains = [] }) => (
   <div className="card flex flex-col h-full overflow-hidden">
     <div className="flex items-center gap-2 mb-4 shrink-0">
       <GitCommit size={16} className="text-accent-primary" />
-      <h3 className="font-semibold text-text-primary text-sm">Causal Chains</h3>
+      <h3 className="font-display font-semibold text-text-primary text-sm">Causal Chains</h3>
       {chains.length > 0 && (
         <span className="px-2 py-0.5 rounded-full bg-accent-primary/20 text-accent-primary text-xs font-bold">
           {chains.length}
