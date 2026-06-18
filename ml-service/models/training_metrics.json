@@ -1,85 +1,87 @@
 {
-  "accuracy": 1.0,
+  "version": "2.0.0",
+  "training_date": "2026-06-18T16:31:41.221904Z",
+  "accuracy": 0.962,
   "classification_report": {
     "critical": {
       "precision": 1.0,
-      "recall": 1.0,
-      "f1-score": 1.0,
+      "recall": 0.945,
+      "f1-score": 0.9717223650385605,
       "support": 200.0
     },
     "debug": {
-      "precision": 1.0,
-      "recall": 1.0,
-      "f1-score": 1.0,
+      "precision": 0.979381443298969,
+      "recall": 0.95,
+      "f1-score": 0.9644670050761421,
       "support": 200.0
     },
     "error": {
-      "precision": 1.0,
-      "recall": 1.0,
-      "f1-score": 1.0,
+      "precision": 0.9895833333333334,
+      "recall": 0.95,
+      "f1-score": 0.9693877551020408,
       "support": 200.0
     },
     "info": {
-      "precision": 1.0,
-      "recall": 1.0,
-      "f1-score": 1.0,
+      "precision": 0.874439461883408,
+      "recall": 0.975,
+      "f1-score": 0.9219858156028369,
       "support": 200.0
     },
     "warning": {
-      "precision": 1.0,
-      "recall": 1.0,
-      "f1-score": 1.0,
+      "precision": 0.9801980198019802,
+      "recall": 0.99,
+      "f1-score": 0.9850746268656716,
       "support": 200.0
     },
-    "accuracy": 1.0,
+    "accuracy": 0.962,
     "macro avg": {
-      "precision": 1.0,
-      "recall": 1.0,
-      "f1-score": 1.0,
+      "precision": 0.9647204516635381,
+      "recall": 0.962,
+      "f1-score": 0.9625275135370502,
       "support": 1000.0
     },
     "weighted avg": {
-      "precision": 1.0,
-      "recall": 1.0,
-      "f1-score": 1.0,
+      "precision": 0.9647204516635381,
+      "recall": 0.962,
+      "f1-score": 0.9625275135370503,
       "support": 1000.0
     }
   },
   "confusion_matrix": [
     [
-      200,
+      189,
       0,
+      1,
+      8,
+      2
+    ],
+    [
       0,
+      190,
       0,
+      10,
       0
     ],
     [
       0,
-      200,
-      0,
-      0,
-      0
+      1,
+      190,
+      8,
+      1
     ],
     [
       0,
-      0,
-      200,
-      0,
-      0
-    ],
-    [
-      0,
-      0,
-      0,
-      200,
-      0
+      3,
+      1,
+      195,
+      1
     ],
     [
       0,
       0,
       0,
-      0,
-      200
+      2,
+      198
     ]
   ],
   "classes": [

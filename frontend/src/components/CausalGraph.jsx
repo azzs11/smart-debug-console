@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import { GitCommit, Maximize2, RefreshCw, X } from 'lucide-react';
+import { GitCommit, RefreshCw, X } from 'lucide-react';
 import SeverityBadge from './SeverityBadge';
 
 const SEVERITY_COLORS = {
@@ -11,13 +11,6 @@ const SEVERITY_COLORS = {
   debug:    '#6b7280',
 };
 
-const SEVERITY_GLOW = {
-  critical: 'rgba(220,38,38,0.5)',
-  error:    'rgba(249,115,22,0.4)',
-  warning:  'rgba(245,158,11,0.3)',
-  info:     'rgba(59,130,246,0.3)',
-  debug:    'rgba(107,114,128,0.2)',
-};
 
 function nodeRadius(blastRadius) {
   return Math.max(8, Math.min(28, 8 + (blastRadius || 0) * 1.2));
