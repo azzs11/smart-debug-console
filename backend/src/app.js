@@ -3,9 +3,11 @@ const cors    = require('cors');
 const helmet  = require('helmet');
 const { apiLimiter }      = require('./middleware/rateLimiter');
 const { metricsEndpoint } = require('./middleware/metrics');
-const logsRouter   = require('./routes/logs');
-const causalRouter = require('./routes/causal');
-const healthRouter = require('./routes/health');
+const logsRouter      = require('./routes/logs');
+const causalRouter    = require('./routes/causal');
+const healthRouter    = require('./routes/health');
+const metricsRouter   = require('./routes/metrics');
+const anomaliesRouter = require('./routes/anomalies');
 const logger = require('./config/logger');
 
 const app = express();
@@ -39,9 +41,11 @@ app.use(apiLimiter);
 
 // ── Routes ────────────────────────────────────────────────────────────────────
 app.get('/metrics', metricsEndpoint);
-app.use('/health',     healthRouter);
-app.use('/api/logs',   logsRouter);
-app.use('/api/causal', causalRouter);
+app.use('/health',          healthRouter);
+app.use('/api/logs',        logsRouter);
+app.use('/api/causal',      causalRouter);
+app.use('/api/anomalies',   anomaliesRouter);
+app.use('/api/metrics',     metricsRouter);
 
 // ── 404 ───────────────────────────────────────────────────────────────────────
 app.use((req, res) => {

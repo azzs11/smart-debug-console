@@ -1,19 +1,169 @@
-/* frontend/src/index.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+:root {
+  --bg-base:     #0a0e1a;
+  --bg-surface:  #111827;
+  --bg-elevated: #1f2937;
+  --accent-primary:   #6366f1;
+  --accent-secondary: #8b5cf6;
+  --accent-success:   #10b981;
+  --accent-warning:   #f59e0b;
+  --accent-danger:    #ef4444;
+  --accent-critical:  #dc2626;
+  --text-primary:   #f9fafb;
+  --text-secondary: #9ca3af;
+  --text-muted:     #4b5563;
+  --border:         #1f2937;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+* { box-sizing: border-box; }
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
+
+/* ── Custom scrollbar ───────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: var(--bg-elevated); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #374151; }
+
+/* ── Log stream animations ──────────────────────────────────────── */
+@keyframes logSlide {
+  from { opacity: 0; transform: translateX(8px); }
+  to   { opacity: 1; transform: translateX(0);   }
+}
+.log-entry-new { animation: logSlide 0.2s ease-out; }
+
+@keyframes criticalFlash {
+  0%, 100% { background: transparent; }
+  50%       { background: rgba(239,68,68,0.08); }
+}
+.log-critical-flash { animation: criticalFlash 0.6s ease-out; }
+
+/* ── Glow utilities ─────────────────────────────────────────────── */
+.glow-red    { box-shadow: 0 0 20px rgba(239,68,68,0.4); }
+.glow-indigo { box-shadow: 0 0 20px rgba(99,102,241,0.3); }
+.glow-green  { box-shadow: 0 0 20px rgba(16,185,129,0.3); }
+
+/* ── App shell layout ───────────────────────────────────────────── */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-base);
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.app-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+/* ── Sidebar ────────────────────────────────────────────────────── */
+.sidenav {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0;
+  overflow-y: auto;
+}
+
+/* ── TopBar ─────────────────────────────────────────────────────── */
+.topbar {
+  height: 60px;
+  flex-shrink: 0;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 16px;
+  z-index: 50;
+}
+
+/* ── Terminal log stream ────────────────────────────────────────── */
+.log-stream {
+  background: #0a0e1a;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.log-stream-header {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-surface);
+}
+
+.log-stream-body {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.log-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 5px 16px;
+  border-left: 2px solid transparent;
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s;
+}
+
+.log-row:hover {
+  background: rgba(255,255,255,0.04);
+  border-left-color: var(--accent-primary);
+}
+
+/* ── Cards ──────────────────────────────────────────────────────── */
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+/* ── Number counter animation ───────────────────────────────────── */
+@keyframes countUp {
+  from { opacity: 0.4; transform: translateY(4px); }
+  to   { opacity: 1;   transform: translateY(0);   }
+}
+.count-update { animation: countUp 0.3s ease-out; }
+
+/* ── Toast ──────────────────────────────────────────────────────── */
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0);    }
+}
+@keyframes toastOut {
+  from { opacity: 1; transform: translateX(0);    }
+  to   { opacity: 0; transform: translateX(24px); }
+}
+.toast-enter { animation: toastIn  0.3s ease-out; }
+.toast-exit  { animation: toastOut 0.3s ease-out forwards; }
