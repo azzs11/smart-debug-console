@@ -1,18 +1,7 @@
 const client = require('prom-client');
 
-// Create a Registry
 const register = new client.Registry();
-
-// Add default metrics
 client.collectDefaultMetrics({ register });
-
-// Custom metrics
-const httpRequestDuration = new client.Histogram({
-  name: 'http_request_duration_seconds',
-  help: 'Duration of HTTP requests in seconds',
-  labelNames: ['method', 'route', 'status_code'],
-  registers: [register]
-});
 
 const logsProcessed = new client.Counter({
   name: 'logs_processed_total',
@@ -27,9 +16,36 @@ const activeConnections = new client.Gauge({
   registers: [register]
 });
 
+const httpRequestDuration = new client.Histogram({
+  name: 'http_request_duration_seconds',
+  help: 'Duration of HTTP requests in seconds',
+  labelNames: ['method', 'route', 'status_code'],
+  registers: [register]
+});
+
+const causalLinksDetected = new client.Counter({
+  name: 'causal_links_detected_total',
+  help: 'Total number of causal links detected between logs',
+  registers: [register]
+});
+
+const anomaliesDetected = new client.Counter({
+  name: 'anomalies_detected_total',
+  help: 'Total number of anomalous log patterns detected',
+  registers: [register]
+});
+
+async function metricsEndpoint(req, res) {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
+}
+
 module.exports = {
   register,
-  httpRequestDuration,
   logsProcessed,
-  activeConnections
+  activeConnections,
+  httpRequestDuration,
+  causalLinksDetected,
+  anomaliesDetected,
+  metricsEndpoint
 };

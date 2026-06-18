@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 import sys
+import json
 from pathlib import Path
 import time
 
@@ -230,6 +231,48 @@ def model_info():
             "status": "error",
             "message": str(e)
         }), 500
+
+@app.route('/api/model/metadata', methods=['GET'])
+def model_metadata():
+    """Return training metadata: date, version, accuracy, per-class distribution."""
+    try:
+        metrics_path = Path(MODEL_PATH).parent / "training_metrics.json"
+        if not metrics_path.exists():
+            return jsonify({
+                "status": "error",
+                "message": "training_metrics.json not found — run train_model.py first"
+            }), 404
+
+        with open(metrics_path, "r") as f:
+            metrics = json.load(f)
+
+        class_distribution = {}
+        for cls, scores in metrics.get("classification_report", {}).items():
+            if isinstance(scores, dict) and "f1-score" in scores:
+                class_distribution[cls] = {
+                    "precision": round(scores["precision"], 4),
+                    "recall":    round(scores["recall"], 4),
+                    "f1_score":  round(scores["f1-score"], 4),
+                    "support":   int(scores["support"])
+                }
+
+        return jsonify({
+            "status": "success",
+            "data": {
+                "version":          metrics.get("version", "1.0.0"),
+                "training_date":    metrics.get("training_date"),
+                "accuracy":         round(metrics.get("accuracy", 0), 4),
+                "training_samples": metrics.get("training_samples"),
+                "test_samples":     metrics.get("test_samples"),
+                "classes":          metrics.get("classes", []),
+                "class_distribution": class_distribution,
+                "model_loaded":     classifier.is_trained
+            }
+        }), 200
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 
 @app.route('/api/model/retrain', methods=['POST'])
 def retrain_model():
