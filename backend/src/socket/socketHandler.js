@@ -10,11 +10,18 @@ let _processLog = async () => ({});
 function setLogProcessor(fn) { _processLog = fn; }
 
 function initializeSocket(server) {
+  const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:3000')
+    .split(',')
+    .map(o => o.trim());
+
   io = socketIo(server, {
     cors: {
-      origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
-      methods: ['GET', 'POST'],
-      credentials: true
+      origin: (origin, cb) => {
+        if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+        cb(new Error(`Socket.io CORS: origin ${origin} not allowed`));
+      },
+      methods:      ['GET', 'POST'],
+      credentials:  true
     }
   });
 

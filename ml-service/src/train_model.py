@@ -55,14 +55,16 @@ def train_model():
     # Save metrics
     metrics_file = MODEL_PATH.parent / "training_metrics.json"
     with open(metrics_file, 'w') as f:
-        # Convert numpy arrays to lists for JSON serialization
+        from datetime import datetime as _dt
         json_metrics = {
-            "accuracy": metrics['accuracy'],
+            "version":          "2.0.0",
+            "training_date":    _dt.utcnow().isoformat() + "Z",
+            "accuracy":         metrics['accuracy'],
             "classification_report": metrics['classification_report'],
             "confusion_matrix": metrics['confusion_matrix'],
-            "classes": metrics['classes'],
+            "classes":          metrics['classes'],
             "training_samples": metrics['training_samples'],
-            "test_samples": metrics['test_samples']
+            "test_samples":     metrics['test_samples']
         }
         json.dump(json_metrics, f, indent=2)
     

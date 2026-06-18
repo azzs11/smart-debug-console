@@ -1,7 +1,9 @@
 const express = require('express');
 const router  = express.Router();
 const { DEFAULT_LOG_LIMIT, GENERATOR_DEFAULT_INTERVAL_MS } = require('../config/constants');
-const { validateLog, validateQueryLimit } = require('../middleware/validation');
+const { validateLog, validateQueryLimit, validateGeneratorStart } = require('../middleware/validation');
+const { logsIngestionLimiter, generatorLimiter } = require('../middleware/rateLimiter');
+const { requireApiKey } = require('../middleware/apiKeyAuth');
 const logRepository = require('../db/logRepository');
 const { processLog } = require('../services/logProcessor');
 
@@ -80,8 +82,8 @@ router.get('/', validateQueryLimit, async (req, res) => {
   }
 });
 
-/** POST /api/logs */
-router.post('/', validateLog, async (req, res) => {
+/** POST /api/logs — high-throughput ingestion rate limit */
+router.post('/', logsIngestionLimiter, validateLog, async (req, res) => {
   try {
     const log = await processLog(req.body);
     res.status(201).json({ status: 'success', data: log });
@@ -126,8 +128,8 @@ router.get('/generator/status', (req, res) => {
   res.json({ status: 'success', data: { isActive: generatorActive } });
 });
 
-/** POST /api/logs/generator/start */
-router.post('/generator/start', (req, res) => {
+/** POST /api/logs/generator/start — admin only */
+router.post('/generator/start', generatorLimiter, requireApiKey, validateGeneratorStart, (req, res) => {
   if (generatorActive) {
     return res.json({ status: 'success', message: 'Generator already running' });
   }
@@ -137,8 +139,8 @@ router.post('/generator/start', (req, res) => {
   res.json({ status: 'success', message: 'Log generator started', interval });
 });
 
-/** POST /api/logs/generator/stop */
-router.post('/generator/stop', (req, res) => {
+/** POST /api/logs/generator/stop — admin only */
+router.post('/generator/stop', generatorLimiter, requireApiKey, (req, res) => {
   if (!generatorActive) {
     return res.json({ status: 'success', message: 'Generator not running' });
   }

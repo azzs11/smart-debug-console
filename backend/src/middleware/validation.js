@@ -1,29 +1,64 @@
+const { body, query, validationResult } = require('express-validator');
 const { VALID_SEVERITIES, MAX_LOG_LIMIT } = require('../config/constants');
 
-function validateLog(req, res, next) {
-  const { message, severity } = req.body;
+// ── Shared error formatter ────────────────────────────────────────────────────
 
-  if (!message || typeof message !== 'string' || message.trim().length === 0) {
-    return res.status(400).json({ status: 'error', message: 'message is required and must be a non-empty string' });
-  }
-  if (message.length > 2000) {
-    return res.status(400).json({ status: 'error', message: 'message must not exceed 2000 characters' });
-  }
-  if (severity && !VALID_SEVERITIES.includes(severity.toLowerCase())) {
-    return res.status(400).json({ status: 'error', message: `severity must be one of: ${VALID_SEVERITIES.join(', ')}` });
-  }
-
-  req.body.message = message.trim();
-  if (req.body.severity) req.body.severity = req.body.severity.toLowerCase();
-  next();
-}
-
-function validateQueryLimit(req, res, next) {
-  const limit = parseInt(req.query.limit);
-  if (req.query.limit !== undefined && (isNaN(limit) || limit < 1 || limit > MAX_LOG_LIMIT)) {
-    return res.status(400).json({ status: 'error', message: `limit must be between 1 and ${MAX_LOG_LIMIT}` });
+function handleValidationErrors(req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Validation failed',
+      errors: errors.array().map(e => ({ field: e.path, message: e.msg }))
+    });
   }
   next();
 }
 
-module.exports = { validateLog, validateQueryLimit };
+// ── Log body validation ───────────────────────────────────────────────────────
+
+const validateLog = [
+  body('message')
+    .isString().withMessage('message must be a string')
+    .trim()
+    .notEmpty().withMessage('message is required')
+    .isLength({ max: 2000 }).withMessage('message must not exceed 2000 characters'),
+
+  body('severity')
+    .optional()
+    .isString().withMessage('severity must be a string')
+    .customSanitizer(v => v?.toLowerCase())
+    .isIn(VALID_SEVERITIES).withMessage(`severity must be one of: ${VALID_SEVERITIES.join(', ')}`),
+
+  body('source')
+    .optional()
+    .isString().withMessage('source must be a string')
+    .trim()
+    .isLength({ max: 100 }).withMessage('source must not exceed 100 characters'),
+
+  handleValidationErrors
+];
+
+// ── Query-param limit validation ─────────────────────────────────────────────
+
+const validateQueryLimit = [
+  query('limit')
+    .optional()
+    .isInt({ min: 1, max: MAX_LOG_LIMIT })
+    .withMessage(`limit must be an integer between 1 and ${MAX_LOG_LIMIT}`),
+
+  handleValidationErrors
+];
+
+// ── Generator interval validation ────────────────────────────────────────────
+
+const validateGeneratorStart = [
+  body('interval')
+    .optional()
+    .isInt({ min: 200, max: 60000 })
+    .withMessage('interval must be between 200 and 60000 milliseconds'),
+
+  handleValidationErrors
+];
+
+module.exports = { validateLog, validateQueryLimit, validateGeneratorStart, handleValidationErrors };
