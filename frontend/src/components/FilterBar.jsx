@@ -1,86 +1,56 @@
-import { Filter, RotateCcw, Search } from 'lucide-react';
+import { Search, Filter, RotateCcw } from 'lucide-react';
 
-const FilterBar = ({ 
-  searchTerm, 
-  setSearchTerm, 
-  selectedSeverity, 
-  setSelectedSeverity,
-  onClearLogs 
-}) => {
-  const severities = ['all', 'critical', 'error', 'warning', 'info', 'debug'];
+const SEVERITIES = ['all', 'critical', 'error', 'warning', 'info', 'debug'];
 
-  const getSeverityColor = (severity) => {
-    const colors = {
-      all: 'bg-gray-500',
-      critical: 'bg-red-600',
-      error: 'bg-orange-500',
-      warning: 'bg-yellow-500',
-      info: 'bg-blue-500',
-      debug: 'bg-gray-400'
-    };
-    return colors[severity] || 'bg-gray-500';
-  };
-
-  return (
-    <div className="filter-bar bg-white rounded-lg shadow-md p-4 mb-6">
-      <div className="flex flex-wrap gap-4 items-center">
-        {/* Search Input */}
-        <div className="flex-1 min-w-[250px]">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <input
-              type="text"
-              placeholder="Search logs..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        </div>
-
-        {/* Severity Filter */}
-        <div className="flex items-center gap-2">
-          <Filter size={20} className="text-gray-600" />
-          <select
-            value={selectedSeverity}
-            onChange={(e) => setSelectedSeverity(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
-          >
-            {severities.map(severity => (
-              <option key={severity} value={severity}>
-                {severity.charAt(0).toUpperCase() + severity.slice(1)}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Clear Button */}
-        <button
-          onClick={onClearLogs}
-          className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200"
-        >
-          <RotateCcw size={18} />
-          Clear Logs
-        </button>
-      </div>
-
-      {/* Active Filters Display */}
-      {(searchTerm || selectedSeverity !== 'all') && (
-        <div className="mt-3 flex flex-wrap gap-2">
-          {searchTerm && (
-            <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
-              Search: "{searchTerm}"
-            </span>
-          )}
-          {selectedSeverity !== 'all' && (
-            <span className={`px-3 py-1 ${getSeverityColor(selectedSeverity)} text-white rounded-full text-sm`}>
-              Filter: {selectedSeverity}
-            </span>
-          )}
-        </div>
-      )}
+const FilterBar = ({ searchTerm, setSearchTerm, selectedSeverity, setSelectedSeverity, onClearLogs }) => (
+  <div className="card flex flex-wrap items-center gap-3 mb-4">
+    {/* Search */}
+    <div className="flex-1 min-w-48 relative">
+      <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
+      <input
+        type="text"
+        placeholder="Search logs..."
+        value={searchTerm}
+        onChange={e => setSearchTerm(e.target.value)}
+        className="w-full pl-8 pr-3 py-2 bg-bg-base border border-border-dim rounded-lg text-sm text-text-primary placeholder-text-muted focus:outline-none focus:border-accent-primary font-mono transition-colors"
+      />
     </div>
-  );
-};
+
+    {/* Severity pills */}
+    <div className="flex items-center gap-1 flex-wrap">
+      {SEVERITIES.map(sev => {
+        const active = selectedSeverity === sev;
+        const colorMap = {
+          all: 'bg-indigo-500/20 text-indigo-400 border-indigo-500/40',
+          critical: 'bg-red-500/20 text-red-400 border-red-500/40',
+          error: 'bg-orange-500/20 text-orange-400 border-orange-500/40',
+          warning: 'bg-amber-500/20 text-amber-400 border-amber-500/40',
+          info: 'bg-blue-500/20 text-blue-400 border-blue-500/40',
+          debug: 'bg-gray-500/20 text-gray-400 border-gray-500/40',
+        };
+        return (
+          <button
+            key={sev}
+            onClick={() => setSelectedSeverity(sev)}
+            className={`px-2.5 py-1 rounded text-xs font-mono font-semibold uppercase tracking-wide border transition-all duration-150 ${
+              active ? colorMap[sev] : 'bg-transparent text-text-muted border-border-dim hover:border-text-muted'
+            }`}
+          >
+            {sev}
+          </button>
+        );
+      })}
+    </div>
+
+    {/* Clear */}
+    <button
+      onClick={onClearLogs}
+      className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold hover:bg-red-500/20 transition-colors"
+    >
+      <RotateCcw size={12} />
+      Clear
+    </button>
+  </div>
+);
 
 export default FilterBar;
