@@ -1,25 +1,39 @@
+import { useEffect, useRef } from 'react';
 
-const StatsCard = ({ title, value, icon, color = 'blue' }) => {
-  const colorClasses = {
-    blue: 'from-blue-500 to-blue-600',
-    red: 'from-red-500 to-red-600',
-    yellow: 'from-yellow-500 to-yellow-600',
-    green: 'from-green-500 to-green-600',
-    purple: 'from-purple-500 to-purple-600',
-    gray: 'from-gray-500 to-gray-600'
-  };
+const COLOR_MAP = {
+  blue:     { border: 'border-blue-500/40',   text: 'text-blue-400',   glow: '' },
+  red:      { border: 'border-red-500/40',    text: 'text-red-400',    glow: 'glow-red' },
+  orange:   { border: 'border-orange-500/40', text: 'text-orange-400', glow: '' },
+  yellow:   { border: 'border-amber-500/40',  text: 'text-amber-400',  glow: '' },
+  green:    { border: 'border-green-500/40',  text: 'text-green-400',  glow: '' },
+  purple:   { border: 'border-purple-500/40', text: 'text-purple-400', glow: '' },
+  gray:     { border: 'border-gray-500/40',   text: 'text-gray-400',   glow: '' },
+};
+
+const StatsCard = ({ title, value, icon, color = 'blue', subtitle, glow = false }) => {
+  const prevRef  = useRef(value);
+  const spanRef  = useRef(null);
+  const cfg = COLOR_MAP[color] || COLOR_MAP.blue;
+
+  useEffect(() => {
+    if (prevRef.current !== value && spanRef.current) {
+      spanRef.current.classList.remove('count-update');
+      void spanRef.current.offsetWidth; // reflow
+      spanRef.current.classList.add('count-update');
+    }
+    prevRef.current = value;
+  }, [value]);
 
   return (
-    <div className={`stats-card bg-gradient-to-br ${colorClasses[color]} text-white rounded-lg p-6 shadow-lg transform transition-all duration-300 hover:scale-105`}>
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm opacity-90 mb-1">{title}</p>
-          <p className="text-3xl font-bold">{value}</p>
-        </div>
-        <div className="text-4xl opacity-80">
-          {icon}
-        </div>
+    <div className={`card border-l-4 ${cfg.border} ${glow ? cfg.glow : ''} flex items-start justify-between gap-3 transition-all duration-300`}>
+      <div className="min-w-0">
+        <p className="text-xs text-text-secondary uppercase tracking-wider font-medium mb-1">{title}</p>
+        <p ref={spanRef} className={`text-3xl font-bold ${cfg.text} tabular-nums`}>
+          {typeof value === 'number' ? value.toLocaleString() : value}
+        </p>
+        {subtitle && <p className="text-xs text-text-muted mt-0.5">{subtitle}</p>}
       </div>
+      <div className={`${cfg.text} opacity-60 shrink-0 mt-0.5`}>{icon}</div>
     </div>
   );
 };

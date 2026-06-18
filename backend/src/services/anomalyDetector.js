@@ -32,9 +32,10 @@ const SEVERITY_FREQ_SPIKE_FACTOR  = 2.0;
 
 class AnomalyDetector {
   constructor() {
-    this.window   = [];   // lightweight { severity, source, timestamp }
-    this.baseline = null;
-    this.logCount = 0;
+    this.window       = [];   // lightweight { severity, source, timestamp }
+    this.baseline     = null;
+    this.logCount     = 0;
+    this.fingerprints = new Map(); // hash → { hash, firstSeen, lastSeen, count, severity, source }
   }
 
   // ─── Baseline ──────────────────────────────────────────────────────────────
@@ -152,37 +153,64 @@ class AnomalyDetector {
    * @returns {{ isAnomaly: boolean, anomalyScore: number, fingerprintHash: string }}
    */
   analyze(log) {
-    // Update sliding window
     this.window.push({ severity: log.severity, source: log.source, timestamp: log.timestamp });
     if (this.window.length > ANOMALY_WINDOW_SIZE) this.window.shift();
     this.logCount++;
 
-    // Recompute baseline every 10 logs
     if (this.logCount % 10 === 0) this.updateBaseline();
 
-    // Compute composite anomaly score
-    const freqScore     = this.severityFrequencyAnomaly(log.severity);
-    const bigramScore   = this.bigramSequenceAnomaly(log.severity);
-    const burstScore    = this.burstAnomaly();
-    const anomalyScore  = Math.min(freqScore + bigramScore + burstScore, 1.0);
-    const isAnomaly     = anomalyScore >= ANOMALY_THRESHOLD;
+    const freqScore       = this.severityFrequencyAnomaly(log.severity);
+    const bigramScore     = this.bigramSequenceAnomaly(log.severity);
+    const burstScore      = this.burstAnomaly();
+    const anomalyScore    = Math.min(freqScore + bigramScore + burstScore, 1.0);
+    const isAnomaly       = anomalyScore >= ANOMALY_THRESHOLD;
     const fingerprintHash = this.generateFingerprint(log, anomalyScore);
 
     if (isAnomaly) {
       logger.debug('Temporal anomaly detected', {
-        logId:       log.id?.slice(0, 8),
-        severity:    log.severity,
-        score:       anomalyScore.toFixed(3),
-        signals:     { freq: freqScore, bigram: bigramScore, burst: burstScore },
+        logId: log.id?.slice(0, 8), severity: log.severity,
+        score: anomalyScore.toFixed(3),
+        signals: { freq: freqScore, bigram: bigramScore, burst: burstScore },
         fingerprint: fingerprintHash.slice(0, 16)
       });
+      // Track fingerprint occurrences
+      const existing = this.fingerprints.get(fingerprintHash);
+      if (existing) {
+        existing.count++;
+        existing.lastSeen = log.timestamp || new Date().toISOString();
+        existing.lastSeverity = log.severity;
+      } else {
+        this.fingerprints.set(fingerprintHash, {
+          hash: fingerprintHash,
+          firstSeen: log.timestamp || new Date().toISOString(),
+          lastSeen: log.timestamp || new Date().toISOString(),
+          count: 1,
+          severity: log.severity,
+          source: log.source,
+          avgScore: anomalyScore
+        });
+      }
     }
 
     return { isAnomaly, anomalyScore: parseFloat(anomalyScore.toFixed(4)), fingerprintHash };
   }
+
+  getFingerprints() {
+    return [...this.fingerprints.values()].sort((a, b) => b.count - a.count);
+  }
+
+  _reset() {
+    this.window   = [];
+    this.baseline = null;
+    this.logCount = 0;
+    this.fingerprints.clear();
+  }
 }
 
-// Singleton — one detector per process, preserving the sliding window across all logs
 const detector = new AnomalyDetector();
 
-module.exports = { analyze: (log) => detector.analyze(log) };
+module.exports = {
+  analyze:         (log) => detector.analyze(log),
+  getFingerprints: ()    => detector.getFingerprints(),
+  _reset:          ()    => detector._reset()
+};

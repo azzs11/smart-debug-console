@@ -312,4 +312,6 @@ function getGraphData() {
   return { nodes: [...nodes.values()], edges };
 }
 
-module.exports = { analyzeLog, getActiveCausalChains, getChainById, getGraphData, onChainDetected };
+function _reset() { recentLogs = []; }
+
+module.exports = { analyzeLog, getActiveCausalChains, getChainById, getGraphData, onChainDetected, _reset };
