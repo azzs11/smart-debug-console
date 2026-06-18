@@ -11,7 +11,7 @@
  *   6. Broadcast via WebSocket + update Prometheus counters
  */
 
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 const { VALID_SEVERITIES } = require('../config/constants');
 const mlService       = require('./mlService');
 const causalEngine    = require('./causalEngine');
@@ -34,7 +34,7 @@ function setEmitters({ emitLog, emitStats, emitCausalEvent }) {
 async function processLog(logData) {
   // 1. Normalise
   const log = {
-    id:        logData.id        || uuidv4(),
+    id:        logData.id        || randomUUID(),
     message:   (logData.message  || 'No message').trim().slice(0, 2000),
     severity:  VALID_SEVERITIES.includes(logData.severity) ? logData.severity : 'info',
     source:    (logData.source   || 'unknown').slice(0, 100),

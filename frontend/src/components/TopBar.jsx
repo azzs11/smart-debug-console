@@ -62,16 +62,6 @@ const TopBar = ({ isConnected, mlEnabled, logsPerMin, logRateHistory, stats, onO
 
       {/* Right side */}
       <div className="flex items-center gap-3 shrink-0">
-        {/* Connection status */}
-        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border ${
-          isConnected
-            ? 'bg-green-500/10 border-green-500/30 text-green-400'
-            : 'bg-red-500/10  border-red-500/30  text-red-400'
-        }`}>
-          <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-400 animate-pulse-dot' : 'bg-red-400'}`} />
-          {isConnected ? 'Connected' : 'Disconnected'}
-        </div>
-
         {onOpenSettings && (
           <button onClick={onOpenSettings} className="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-elevated transition-colors">
             <Settings size={18} />
