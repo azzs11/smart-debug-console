@@ -1,42 +1,31 @@
 const express = require('express');
-const cors = require('cors');
-const logRoutes = require('./routes/logRoutes');
+const cors    = require('cors');
+const { rateLimiter }    = require('./middleware/rateLimiter');
+const { metricsEndpoint } = require('./middleware/metrics');
+const logsRouter   = require('./routes/logs');
+const causalRouter = require('./routes/causal');
+const healthRouter = require('./routes/health');
+const logger = require('./config/logger');
 
 const app = express();
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:3000', credentials: true }));
+app.use(express.json({ limit: '1mb' }));
+app.use(rateLimiter);
 
-// Routes
-app.use('/api/logs', logRoutes);
+app.get('/metrics', metricsEndpoint);
+app.use('/health',     healthRouter);
+app.use('/api/logs',   logsRouter);
+app.use('/api/causal', causalRouter);
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    message: 'Smart Debug Console API is running',
-    timestamp: new Date().toISOString()
-  });
-});
-
-// 404 handler
 app.use((req, res) => {
-  res.status(404).json({
-    status: 'error',
-    message: 'Route not found'
-  });
+  res.status(404).json({ status: 'error', message: `Route ${req.method} ${req.path} not found` });
 });
 
-// Error handler
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    status: 'error',
-    message: 'Something went wrong!',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
+  logger.error('Unhandled error', { error: err.message });
+  res.status(500).json({ status: 'error', message: 'Internal server error' });
 });
 
 module.exports = app;

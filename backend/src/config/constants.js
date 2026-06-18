@@ -1,0 +1,14 @@
+module.exports = {
+  MAX_LOGS_IN_MEMORY: 1000,
+  DEFAULT_LOG_LIMIT: 50,
+  MAX_LOG_LIMIT: 500,
+  ML_TIMEOUT_MS: 3000,
+  ML_RETRY_ATTEMPTS: 3,
+  GENERATOR_DEFAULT_INTERVAL_MS: 2000,
+  VALID_SEVERITIES: ['critical', 'error', 'warning', 'info', 'debug'],
+  SEVERITY_WEIGHTS: { critical: 5, error: 4, warning: 3, info: 2, debug: 1 },
+  CAUSAL_WINDOW_MS: 30000,
+  CAUSAL_MAX_CHAIN_DEPTH: 10,
+  ANOMALY_WINDOW_SIZE: 100,
+  BLAST_RADIUS_DECAY: 0.8
+};
