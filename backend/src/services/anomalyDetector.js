@@ -1,119 +1,188 @@
 /**
  * Temporal Anomaly Fingerprinting
  *
- * Learns the normal "rhythm" of the log stream — what severities appear in
- * what ratios and sequence — and detects when that rhythm breaks, even if
- * each individual log looks ordinary.
+ * Learns the "rhythm" of the log stream and detects when it breaks — even
+ * when individual logs look normal. Inspired by how DDoS detection works:
+ * not the individual packet, but the pattern.
  *
- * Algorithm:
- *   1. Maintain a sliding window of the last ANOMALY_WINDOW_SIZE logs.
- *   2. Recompute a baseline distribution every 10 logs.
- *   3. For each new log, compare the recent 10-log slice against baseline
- *      using a weighted relative deviation (heavier on critical/error).
- *   4. Add a spike bonus when high-severity logs appear at >2x baseline rate.
- *   5. Compute a SHA-256 fingerprint of the last-20 severity sequence.
+ * Baseline (recomputed every 10 logs from the last WINDOW_SIZE logs):
+ *   - severityRates      : expected proportion of each severity
+ *   - severityBigrams    : transition frequencies  (e.g. info→error = 4%)
+ *   - interArrivalMean   : average ms between consecutive logs
+ *   - interArrivalStddev : stddev of inter-arrival times
+ *   - sourceDist         : source frequency distribution
+ *
+ * Anomaly score (0–1) composed of three independent signals:
+ *   1. Severity frequency anomaly : recent rate > 2× baseline rate    → +0.4
+ *   2. Sequence (bigram) anomaly  : transition frequency < 2%          → +0.3
+ *   3. Burst anomaly              : inter-arrival < 30% of baseline mean → +0.3
+ *
+ * Fingerprint: SHA-256 of "severity:source:rounded_score" — same failure
+ * mode produces the same fingerprint across incidents.
  */
 
 const crypto = require('crypto');
 const { ANOMALY_WINDOW_SIZE, SEVERITY_WEIGHTS } = require('../config/constants');
 const logger = require('../config/logger');
 
-let window = [];
-let baseline = null;
-let processedCount = 0;
+const ANOMALY_THRESHOLD           = 0.55;
+const BIGRAM_RARE_THRESHOLD       = 0.02;
+const BURST_FRACTION              = 0.30;
+const SEVERITY_FREQ_SPIKE_FACTOR  = 2.0;
 
-const ANOMALY_THRESHOLD = 0.60;
-const SEVERITY_DEVIATION_WEIGHTS = { critical: 3.0, error: 2.0, warning: 1.2, info: 0.8, debug: 0.5 };
-
-function updateWindow(log) {
-  window.push({ severity: log.severity, timestamp: log.timestamp });
-  if (window.length > ANOMALY_WINDOW_SIZE) window.shift();
-  processedCount++;
-}
-
-function computeBaseline() {
-  if (window.length < 20) return null;
-
-  const counts = { critical: 0, error: 0, warning: 0, info: 0, debug: 0 };
-  window.forEach(l => counts[l.severity] = (counts[l.severity] || 0) + 1);
-  const total = window.length;
-
-  const distribution = {};
-  for (const [sev, count] of Object.entries(counts)) {
-    distribution[sev] = count / total;
+class AnomalyDetector {
+  constructor() {
+    this.window   = [];   // lightweight { severity, source, timestamp }
+    this.baseline = null;
+    this.logCount = 0;
   }
 
-  let totalInterval = 0, intervalCount = 0;
-  for (let i = 1; i < window.length; i++) {
-    const delta = new Date(window[i].timestamp) - new Date(window[i - 1].timestamp);
-    if (delta >= 0) { totalInterval += delta; intervalCount++; }
-  }
+  // ─── Baseline ──────────────────────────────────────────────────────────────
 
-  return { distribution, avgIntervalMs: intervalCount > 0 ? totalInterval / intervalCount : 2000 };
-}
+  /**
+   * Compute the full baseline rhythm from the current window.
+   * Called every 10 logs (cheap — O(WINDOW_SIZE)).
+   */
+  updateBaseline() {
+    const n = this.window.length;
+    if (n < 20) return;
 
-function computeAnomalyScore(log) {
-  if (!baseline || window.length < 20) return 0;
-
-  const recentSlice = window.slice(-10);
-  const recentTotal = recentSlice.length;
-  const recentCounts = { critical: 0, error: 0, warning: 0, info: 0, debug: 0 };
-  recentSlice.forEach(l => recentCounts[l.severity] = (recentCounts[l.severity] || 0) + 1);
-
-  let deviationScore = 0;
-  for (const sev of Object.keys(SEVERITY_WEIGHTS)) {
-    const expected = (baseline.distribution[sev] || 0) * recentTotal;
-    const observed = recentCounts[sev] || 0;
-    if (expected > 0.1) {
-      const relDeviation = Math.abs(observed - expected) / expected;
-      deviationScore += relDeviation * (SEVERITY_DEVIATION_WEIGHTS[sev] || 1);
+    // Severity distribution
+    const severityCounts = { critical: 0, error: 0, warning: 0, info: 0, debug: 0 };
+    this.window.forEach(l => severityCounts[l.severity] = (severityCounts[l.severity] || 0) + 1);
+    const severityRates = {};
+    for (const [sev, cnt] of Object.entries(severityCounts)) {
+      severityRates[sev] = cnt / n;
     }
+
+    // Severity bigrams
+    const bigramCounts = {};
+    for (let i = 1; i < n; i++) {
+      const key = `${this.window[i - 1].severity}→${this.window[i].severity}`;
+      bigramCounts[key] = (bigramCounts[key] || 0) + 1;
+    }
+    const bigramTotal   = n - 1;
+    const severityBigrams = {};
+    for (const [key, cnt] of Object.entries(bigramCounts)) {
+      severityBigrams[key] = cnt / bigramTotal;
+    }
+
+    // Inter-arrival statistics
+    const intervals = [];
+    for (let i = 1; i < n; i++) {
+      const delta = new Date(this.window[i].timestamp) - new Date(this.window[i - 1].timestamp);
+      if (delta >= 0) intervals.push(delta);
+    }
+    const interArrivalMean = intervals.length
+      ? intervals.reduce((a, b) => a + b, 0) / intervals.length
+      : 2000;
+    const variance = intervals.length > 1
+      ? intervals.reduce((acc, d) => acc + (d - interArrivalMean) ** 2, 0) / intervals.length
+      : 0;
+    const interArrivalStddev = Math.sqrt(variance);
+
+    // Source distribution
+    const sourceCounts = {};
+    this.window.forEach(l => sourceCounts[l.source] = (sourceCounts[l.source] || 0) + 1);
+    const sourceDist = {};
+    for (const [src, cnt] of Object.entries(sourceCounts)) {
+      sourceDist[src] = cnt / n;
+    }
+
+    this.baseline = { severityRates, severityBigrams, interArrivalMean, interArrivalStddev, sourceDist };
   }
 
-  const recentHighRate   = (recentCounts.critical + recentCounts.error) / recentTotal;
-  const baselineHighRate = (baseline.distribution.critical || 0) + (baseline.distribution.error || 0);
-  const spikeBonus = baselineHighRate > 0 && recentHighRate > baselineHighRate * 2 ? 0.35 : 0;
+  // ─── Per-signal scorers ────────────────────────────────────────────────────
 
-  const lastTwo = window.slice(-2);
-  let intervalBonus = 0;
-  if (lastTwo.length === 2 && baseline.avgIntervalMs > 0) {
-    const gap = new Date(lastTwo[1].timestamp) - new Date(lastTwo[0].timestamp);
-    if (gap < baseline.avgIntervalMs * 0.1) intervalBonus = 0.1;
+  /** Signal 1: is this severity appearing at > 2× its baseline rate? */
+  severityFrequencyAnomaly(newSeverity) {
+    if (!this.baseline) return 0;
+    const expectedRate = this.baseline.severityRates[newSeverity] ?? 0;
+    if (expectedRate === 0) return 0; // never seen before — skip (cold start)
+
+    // Look at last 20 logs for the recent rate
+    const recent = this.window.slice(-20);
+    const recentRate = recent.filter(l => l.severity === newSeverity).length / recent.length;
+
+    return recentRate > expectedRate * SEVERITY_FREQ_SPIKE_FACTOR ? 0.40 : 0;
   }
 
-  return Math.min((deviationScore / 8) + spikeBonus + intervalBonus, 1);
+  /** Signal 2: is the severity transition (bigram) unusually rare? */
+  bigramSequenceAnomaly(newSeverity) {
+    if (!this.baseline || this.window.length === 0) return 0;
+    const prevSeverity = this.window[this.window.length - 1]?.severity;
+    if (!prevSeverity) return 0;
+
+    const key      = `${prevSeverity}→${newSeverity}`;
+    const bigramFreq = this.baseline.severityBigrams[key] ?? 0;
+    return bigramFreq < BIGRAM_RARE_THRESHOLD ? 0.30 : 0;
+  }
+
+  /** Signal 3: are logs bursting in faster than baseline? */
+  burstAnomaly() {
+    if (!this.baseline || this.baseline.interArrivalMean <= 0) return 0;
+    const recent = this.window.slice(-5);
+    if (recent.length < 2) return 0;
+
+    const intervals = [];
+    for (let i = 1; i < recent.length; i++) {
+      intervals.push(new Date(recent[i].timestamp) - new Date(recent[i - 1].timestamp));
+    }
+    const recentMean = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+    return recentMean < this.baseline.interArrivalMean * BURST_FRACTION ? 0.30 : 0;
+  }
+
+  // ─── Fingerprint ──────────────────────────────────────────────────────────
+
+  /**
+   * Generate a deterministic fingerprint for the current anomaly pattern.
+   * Same failure mode (same severity, same source, same score bucket)
+   * produces the same fingerprint — enabling deduplication across incidents.
+   */
+  generateFingerprint(log, score) {
+    const scoreBucket = Math.round(score * 10); // 0–10
+    const pattern     = `${log.severity}:${log.source}:${scoreBucket}`;
+    return crypto.createHash('sha256').update(pattern).digest('hex').slice(0, 64);
+  }
+
+  // ─── Public API ───────────────────────────────────────────────────────────
+
+  /**
+   * Analyse a log entry and return anomaly metadata.
+   * @returns {{ isAnomaly: boolean, anomalyScore: number, fingerprintHash: string }}
+   */
+  analyze(log) {
+    // Update sliding window
+    this.window.push({ severity: log.severity, source: log.source, timestamp: log.timestamp });
+    if (this.window.length > ANOMALY_WINDOW_SIZE) this.window.shift();
+    this.logCount++;
+
+    // Recompute baseline every 10 logs
+    if (this.logCount % 10 === 0) this.updateBaseline();
+
+    // Compute composite anomaly score
+    const freqScore     = this.severityFrequencyAnomaly(log.severity);
+    const bigramScore   = this.bigramSequenceAnomaly(log.severity);
+    const burstScore    = this.burstAnomaly();
+    const anomalyScore  = Math.min(freqScore + bigramScore + burstScore, 1.0);
+    const isAnomaly     = anomalyScore >= ANOMALY_THRESHOLD;
+    const fingerprintHash = this.generateFingerprint(log, anomalyScore);
+
+    if (isAnomaly) {
+      logger.debug('Temporal anomaly detected', {
+        logId:       log.id?.slice(0, 8),
+        severity:    log.severity,
+        score:       anomalyScore.toFixed(3),
+        signals:     { freq: freqScore, bigram: bigramScore, burst: burstScore },
+        fingerprint: fingerprintHash.slice(0, 16)
+      });
+    }
+
+    return { isAnomaly, anomalyScore: parseFloat(anomalyScore.toFixed(4)), fingerprintHash };
+  }
 }
 
-function buildFingerprintHash() {
-  const sequence = window.slice(-20).map(l => l.severity[0]).join('');
-  return crypto.createHash('sha256').update(sequence).digest('hex').slice(0, 64);
-}
+// Singleton — one detector per process, preserving the sliding window across all logs
+const detector = new AnomalyDetector();
 
-/**
- * Analyse a log entry for temporal anomalies.
- * @returns {{ isAnomaly: boolean, anomalyScore: number, fingerprintHash: string }}
- */
-function analyze(log) {
-  updateWindow(log);
-
-  if (processedCount % 10 === 0) {
-    baseline = computeBaseline();
-  }
-
-  const anomalyScore    = computeAnomalyScore(log);
-  const isAnomaly       = anomalyScore >= ANOMALY_THRESHOLD;
-  const fingerprintHash = buildFingerprintHash();
-
-  if (isAnomaly) {
-    logger.debug('Anomaly detected in log stream', {
-      logId:       log.id?.slice(0, 8),
-      severity:    log.severity,
-      score:       anomalyScore.toFixed(3),
-      fingerprint: fingerprintHash.slice(0, 16)
-    });
-  }
-
-  return { isAnomaly, anomalyScore: parseFloat(anomalyScore.toFixed(4)), fingerprintHash };
-}
-
-module.exports = { analyze };
+module.exports = { analyze: (log) => detector.analyze(log) };

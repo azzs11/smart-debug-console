@@ -3,6 +3,7 @@ const http = require('http');
 const app  = require('./src/app');
 const { initializeSocket, setLogProcessor, emitLog, emitStats, emitCausalEvent } = require('./src/socket/socketHandler');
 const { processLog, setEmitters } = require('./src/services/logProcessor');
+const { onChainDetected } = require('./src/services/causalEngine');
 const { connectDB }  = require('./src/db/client');
 const { checkHealth } = require('./src/services/mlService');
 const logger = require('./src/config/logger');
@@ -13,6 +14,7 @@ const server = http.createServer(app);
 initializeSocket(server);
 setLogProcessor(processLog);
 setEmitters({ emitLog, emitStats, emitCausalEvent });
+onChainDetected(emitCausalEvent);
 
 connectDB().catch(err => logger.warn('PostgreSQL unavailable — using in-memory fallback', { error: err.message }));
 

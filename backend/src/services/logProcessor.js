@@ -99,6 +99,22 @@ async function processLog(logData) {
       depth:        causalResult.causal_chain_depth,
       blast_radius: causalResult.blast_radius_score
     });
+
+    // Deep chain alert — frontend can surface the full root-cause narrative
+    if (causalResult.causal_chain_depth >= 3) {
+      const chain = causalEngine.getChainById(causalResult.causal_root_id);
+      _emitCausal({
+        type:               'causal-chain-detected',
+        root_id:            causalResult.causal_root_id,
+        triggering_log_id:  log.id,
+        chain_depth:        causalResult.causal_chain_depth,
+        total_affected:     chain.length,
+        blast_radius_score: parseFloat(chain.reduce((s, l) => s + (l.blast_radius_score ?? 0), 0).toFixed(3)),
+        chain_preview:      chain.slice(0, 6).map(l => ({
+          id: l.id, severity: l.severity, message: l.message.slice(0, 60), source: l.source
+        }))
+      });
+    }
   }
 
   return log;
