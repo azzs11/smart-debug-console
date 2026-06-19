@@ -6,7 +6,7 @@ import CausalChainPanel from './CausalChainPanel';
 import AnomalyTimeline from './AnomalyTimeline';
 import MLChartsPanel from './MLChartsPanel';
 
-const Dashboard = ({ logs, stats, causalChains, anomalies, mlStats, isMLEnabled, onClearLogs }) => {
+const Dashboard = ({ logs, stats, causalChains, anomalies, mlStats, isMLEnabled, onClearLogs, onOpenSettings }) => {
   const [showML, setShowML] = useState(true);
 
   const bySev = stats?.bySeverity || {};
@@ -38,7 +38,7 @@ const Dashboard = ({ logs, stats, causalChains, anomalies, mlStats, isMLEnabled,
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4" style={{ minHeight: 480 }}>
         {/* Terminal log stream — 60% */}
         <div className="lg:col-span-3">
-          <LogStream logs={logs} onClear={onClearLogs} maxHeight={480} />
+          <LogStream logs={logs} onClear={onClearLogs} onOpenSettings={onOpenSettings} maxHeight={480} />
         </div>
 
         {/* Causal chain panel — 40% */}
@@ -58,7 +58,7 @@ const Dashboard = ({ logs, stats, causalChains, anomalies, mlStats, isMLEnabled,
           onClick={() => setShowML(s => !s)}
           className="flex items-center gap-2 w-full text-left"
         >
-          <span className="font-semibold text-text-primary text-sm">ML Analytics</span>
+          <span className="font-display font-semibold text-text-primary text-sm">ML Analytics</span>
           {isMLEnabled && (
             <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-accent-secondary/20 text-accent-secondary border border-accent-secondary/30">ACTIVE</span>
           )}

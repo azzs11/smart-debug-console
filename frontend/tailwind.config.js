@@ -4,33 +4,34 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'bg-base':     '#0a0e1a',
-        'bg-surface':  '#111827',
-        'bg-elevated': '#1f2937',
-        'accent-primary':   '#6366f1',
-        'accent-secondary': '#8b5cf6',
-        'accent-success':   '#10b981',
-        'accent-warning':   '#f59e0b',
-        'accent-danger':    '#ef4444',
-        'accent-critical':  '#dc2626',
-        'text-primary':   '#f9fafb',
-        'text-secondary': '#9ca3af',
-        'text-muted':     '#4b5563',
-        'border-dim':     '#1f2937',
+        'bg-base':     '#f7f0e6',
+        'bg-surface':  '#fdf8f2',
+        'bg-elevated': '#ede4d8',
+        'accent-primary':   '#0d3d2e',
+        'accent-secondary': '#6d28d9',
+        'accent-success':   '#065f46',
+        'accent-warning':   '#92400e',
+        'accent-danger':    '#991b1b',
+        'accent-critical':  '#7f1d1d',
+        'text-primary':   '#0f1a14',
+        'text-secondary': '#4b5563',
+        'text-muted':     '#9ca3af',
+        'border-dim':     '#d4c9ba',
       },
       fontFamily: {
-        sans:  ['Inter', 'system-ui', 'sans-serif'],
-        mono:  ['"JetBrains Mono"', 'Menlo', 'monospace'],
+        sans:    ['Inter', 'system-ui', 'sans-serif'],
+        mono:    ['"JetBrains Mono"', 'Menlo', 'monospace'],
+        display: ['Fraunces', 'Georgia', 'serif'],
       },
       boxShadow: {
-        'glow-indigo': '0 0 20px rgba(99,102,241,0.3)',
-        'glow-red':    '0 0 20px rgba(239,68,68,0.4)',
-        'glow-green':  '0 0 20px rgba(16,185,129,0.3)',
+        'glow-teal':  '0 4px 16px rgba(13,61,46,0.15)',
+        'glow-red':   '0 4px 16px rgba(185,28,28,0.18)',
+        'glow-green': '0 4px 16px rgba(13,61,46,0.15)',
       },
       animation: {
-        'log-slide': 'logSlide 0.2s ease-out',
+        'log-slide':      'logSlide 0.2s ease-out',
         'critical-flash': 'criticalFlash 0.6s ease-out',
-        'pulse-dot': 'pulseDot 2s cubic-bezier(0.4,0,0.6,1) infinite',
+        'pulse-dot':      'pulseDot 2s cubic-bezier(0.4,0,0.6,1) infinite',
       },
       keyframes: {
         logSlide: {
@@ -39,7 +40,7 @@ module.exports = {
         },
         criticalFlash: {
           '0%,100%': { background: 'transparent' },
-          '50%':     { background: 'rgba(239,68,68,0.08)' },
+          '50%':     { background: 'rgba(185,28,28,0.06)' },
         },
         pulseDot: {
           '0%,100%': { opacity: '1', transform: 'scale(1)' },

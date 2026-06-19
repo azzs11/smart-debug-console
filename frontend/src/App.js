@@ -8,7 +8,9 @@ import CausalGraph from './components/CausalGraph';
 import AnomalyTimeline from './components/AnomalyTimeline';
 import MLChartsPanel from './components/MLChartsPanel';
 import ToastContainer from './components/Toast';
+import Onboarding from './components/Onboarding';
 import socketService from './services/socketService';
+import { X } from 'lucide-react';
 
 const API = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
@@ -31,6 +33,7 @@ function App() {
   const [mlEnabled,     setMlEnabled]     = useState(false);
   const [toasts,        setToasts]        = useState([]);
   const [adminKey,      setAdminKey]      = useState(() => sessionStorage.getItem('adminKey') || '');
+  const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem('chronolog_onboarded'));
 
   // ── Logs/min tracking ──────────────────────────────────────────────────────
   const logTimestamps   = useRef([]);
@@ -163,7 +166,16 @@ function App() {
   // ── Settings view ──────────────────────────────────────────────────────────
   const SettingsView = () => (
     <div className="space-y-4 max-w-lg">
-      <h2 className="text-xl font-bold text-text-primary">Settings</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="font-display text-2xl font-semibold text-text-primary">Settings</h2>
+        <button
+          onClick={() => setActiveView('dashboard')}
+          className="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-elevated transition-colors"
+          title="Close settings"
+        >
+          <X size={18} />
+        </button>
+      </div>
       <div className="card">
         <h3 className="text-sm font-semibold text-text-secondary mb-3">Admin API Key</h3>
         <p className="text-xs text-text-muted mb-3">
@@ -253,6 +265,7 @@ function App() {
               mlStats={mlStats}
               isMLEnabled={mlEnabled}
               onClearLogs={clearLogs}
+              onOpenSettings={() => setActiveView('settings')}
             />
           )}
 
@@ -353,6 +366,13 @@ function App() {
       </div>
 
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
+
+      {showOnboarding && (
+        <Onboarding onClose={() => {
+          localStorage.setItem('chronolog_onboarded', '1');
+          setShowOnboarding(false);
+        }} />
+      )}
     </div>
   );
 }
